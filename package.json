@@ -1,0 +1,9 @@
+{
+  "name": "reiinn-ventory",
+  "version": "1.0.0",
+  "description": "REIINN-ventory portal - local server",
+  "scripts": {
+    "start": "npx serve -p 8080",
+    "serve": "npx serve -p 8080"
+  }
+}

@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>REIINN-ventory | Portal</title>
+    <style>
+        :root {
+            --primary-dark: #0f172a;
+            --sidebar-bg: #1e293b;
+            --accent-blue: #3b82f6;
+            --success-green: #22c55e;
+            --danger-red: #ef4444;
+            --warning-orange: #f59e0b;
+            --light-bg: #f8fafc;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background-color: var(--primary-dark); display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+
+        /* --- CLOCK STYLE --- */
+        #live-clock {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            text-align: right;
+            z-index: 10000;
+            pointer-events: none;
+            display: none; 
+        }
+        #clock-time { font-size: 18px; font-weight: 800; color: var(--primary-dark); display: block; }
+        #clock-date { font-size: 11px; color: #64748b; font-weight: 500; }
+
+        /* --- LOGIN --- */
+        #login-screen { background: white; padding: 50px; border-radius: 12px; width: 360px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); text-align: center; }
+        .login-logo { max-width: 140px; margin-bottom: 20px; }
+        #login-screen input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 6px; box-sizing: border-box; }
+        .btn-login { width: 100%; padding: 12px; background: var(--primary-dark); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+
+        /* --- MAIN APP --- */
+        #main-app { display: none; width: 100vw; height: 100vh; background: var(--light-bg); flex-direction: row; }
+
+        /* SIDEBAR */
+        .sidebar { width: 280px; background: var(--sidebar-bg); color: white; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 2px 0 10px rgba(0,0,0,0.1); }
+        .sidebar-header { padding: 25px 20px; font-weight: bold; font-size: 18px; color: white; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; position: relative; }
+        .sidebar-logo { width: 40px; height: 40px; object-fit: contain; border-radius: 4px; }
+        
+        /* NOTIFICATION BELL */
+        .notif-wrapper { position: relative; cursor: pointer; margin-right: 10px; }
+        .notif-bell { font-size: 20px; }
+        .notif-badge { position: absolute; top: -5px; right: -5px; background: var(--danger-red); color: white; font-size: 10px; padding: 2px 5px; border-radius: 50%; display: none; }
+        .notif-dropdown { display: none; position: absolute; top: 60px; left: 10px; width: 250px; background: white; color: var(--primary-dark); border-radius: 8px; box-shadow: 0 10px 15px rgba(0,0,0,0.2); z-index: 1000; border: 1px solid var(--border-color); }
+        .notif-header { padding: 10px; font-weight: bold; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+        .notif-item { padding: 12px; border-bottom: 1px solid var(--border-color); font-size: 12px; font-weight: normal; }
+        .notif-item:last-child { border: none; }
+        .btn-clear-notif { background: none; border: none; color: var(--accent-blue); font-size: 11px; cursor: pointer; font-weight: 600; }
+        .btn-clear-notif:hover { text-decoration: underline; }
+
+        .menu-item { padding: 16px 25px; cursor: pointer; color: #94a3b8; transition: all 0.2s; font-size: 14px; position: relative; border-left: 4px solid transparent; display: flex; justify-content: space-between; align-items: center; }
+        .menu-item:hover { background: #334155; color: white; }
+        .menu-item.active { background: #0f172a; color: white; border-left-color: var(--accent-blue); }
+        
+        .submenu { display: none; background: #0f172a; flex-direction: column; }
+        .sub-item { padding: 12px 25px 12px 45px; cursor: pointer; color: #94a3b8; font-size: 13px; transition: 0.2s; }
+        .sub-item:hover { color: white; background: #1e293b; }
+        .sub-item.active { color: var(--accent-blue); font-weight: bold; }
+        
+        .menu-arrow { transition: transform 0.3s ease; color: #94a3b8; }
+        .menu-item.open .menu-arrow { transform: rotate(180deg); }
+
+        .logout { margin-top: auto; background: #0f172a; padding: 20px; text-align: center; cursor: pointer; font-size: 13px; color: #94a3b8; font-weight: bold; }
+
+        /* CONTENT */
+        .content-section { flex-grow: 1; padding: 40px; overflow-y: auto; color: var(--primary-dark); display: none; }
+        .content-section.active { display: block; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+        .card { background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow); cursor: default; }
+        .card.clickable { cursor: pointer; transition: transform 0.2s, border-color 0.2s; }
+        .card.clickable:hover { transform: translateY(-3px); border-color: var(--accent-blue); }
+        .card.active-card { border: 2px solid var(--accent-blue); background: #f0f7ff; }
+        .card h3 { margin: 0; color: #64748b; font-size: 12px; text-transform: uppercase; }
+        .card p { margin: 10px 0 0; font-size: 28px; font-weight: 800; }
+
+        .form-panel { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border-color); display: flex; flex-wrap: wrap; gap: 10px; }
+        .form-panel input { padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 12px; min-width: 140px; flex: 1; }
+        
+        .admin-only { display: none; }
+        .search-bar { width: 300px; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 10px; }
+
+        .filter-group { display: flex; gap: 8px; margin-bottom: 15px; }
+        .btn-filter { padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: white; font-size: 12px; cursor: pointer; font-weight: 600; color: #64748b; }
+        .btn-filter:hover { background: #f1f5f9; }
+        .btn-filter.active { background: var(--accent-blue); color: white; border-color: var(--accent-blue); }
+
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
+        th { background: #f8fafc; padding: 12px; text-align: left; color: #64748b; font-size: 10px; text-transform: uppercase; white-space: nowrap; }
+        
+        td { padding: 12px 18px; border-bottom: 1px solid var(--border-color); font-size: 12px; }
+
+        .status-pill { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; cursor: pointer; display: inline-block; text-align: center; min-width: 80px; }
+        .editable-cell { border: 1px dashed transparent; padding: 5px; border-radius: 4px; transition: 0.2s; }
+        .editable-cell:focus { background: #f1f5f9; border-color: var(--accent-blue); outline: none; }
+
+        .btn-action { padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; color: white; }
+        .btn-del { background: #fee2e2; color: #ef4444; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
+        .btn-edit { background: #e0f2fe; color: #0369a1; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin-right: 4px; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center; }
+        .modal-box { background: white; padding: 30px; border-radius: 12px; width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+
+        .cart-list { list-style: none; padding: 0; margin: 0; font-size: 12px; }
+        .cart-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color); }
+        .qty-mini { width: 45px !important; padding: 4px !important; font-size: 11px !important; text-align: center; margin-right: 8px; }
+        .edit-input { width: 100%; padding: 4px; border: 1px solid var(--accent-blue); border-radius: 4px; font-size: 11px; box-sizing: border-box; }
+
+        /* CALENDAR STYLES */
+        .calendar-container { background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow); margin-top: 20px; }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .calendar-nav { display: flex; align-items: center; gap: 10px; }
+        .calendar-btn { background: #f1f5f9; border: 1px solid var(--border-color); padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .calendar-btn:hover { background: #e2e8f0; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
+        .calendar-day-head { font-size: 10px; font-weight: bold; color: #64748b; padding-bottom: 5px; }
+        .calendar-day { padding: 5px; border-radius: 6px; font-size: 11px; border: 1px solid #f1f5f9; position: relative; min-height: 85px; display: flex; flex-direction: column; overflow: hidden; }
+        
+        /* CALENDAR LABELS */
+        .cal-label { font-size: 9px; padding: 2px 4px; border-radius: 3px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; cursor: pointer; transition: opacity 0.2s; }
+        .cal-label:hover { opacity: 0.8; }
+        .label-out { background: var(--success-green); color: white; }
+        .label-return { background: var(--danger-red); color: white; }
+        .label-sched { background: var(--accent-blue); color: white; }
+        
+        .bg-event { background: #f8fafc; }
+    </style>
+</head>
+<body>
+
+    <div id="live-clock">
+        <span id="clock-time">00:00:00 AM</span>
+        <span id="clock-date">Monday, January 01, 2026</span>
+    </div>
+
+    <div id="descModal" class="modal-overlay" onclick="this.style.display='none'">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <h3 id="modalTitle" style="margin-top:0">Details</h3>
+            <div id="fullDescText" style="font-size: 14px; line-height: 1.5; color: #334155;"></div>
+            <button onclick="document.getElementById('descModal').style.display='none'" class="btn-action" style="background:var(--primary-dark); width:100%; margin-top:20px;">Close</button>
+        </div>
+    </div>
+
+    <div id="login-screen">
+        <img src="./logo.png" class="login-logo" alt="Logo">
+        <h1>REIINN-ventory</h1>
+        <input type="text" id="userInput" placeholder="Username">
+        <input type="password" id="passInput" placeholder="Password">
+        <button class="btn-login" onclick="login()">Login</button>
+        <p id="err" style="display:none; color:var(--danger-red); font-size:12px; margin-top:10px;">Login Failed</p>
+    </div>
+
+    <div id="main-app">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="notif-wrapper" onclick="toggleNotifs()">
+                        <span class="notif-bell">🔔</span>
+                        <span id="notif-badge" class="notif-badge">0</span>
+                        <div id="notif-dropdown" class="notif-dropdown" onclick="event.stopPropagation()">
+                            <div class="notif-header">
+                                Notifications
+                                <button class="btn-clear-notif" onclick="clearAllNotifs()">Clear All</button>
+                            </div>
+                            <div id="notif-list"></div>
+                        </div>
+                    </div>
+                    <span style="font-size: 16px; letter-spacing: 0.5px;">REIINN-ventory</span>
+                </div>
+                <img src="./logo.png" class="sidebar-logo" alt="Logo">
+            </div>
+            <div class="menu-item active" onclick="switchTab('dashboard-view', this)"><span>📊 Dashboard</span></div>
+            
+            <div class="menu-item" onclick="toggleSub('inv-submenu', this)">
+                <span>📦 Inventory</span>
+                <svg class="menu-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 9l6 6 6-6"/>
+                </svg>
+            </div>
+            <div id="inv-submenu" class="submenu">
+                <div class="sub-item" onclick="switchTab('inventory-list-view', this)">Inventory List</div>
+                <div class="sub-item admin-only" onclick="switchTab('inventory-reg-view', this)">Inventory Registry</div>
+            </div>
+
+            <div class="menu-item" onclick="switchTab('scheduling-view', this)"><span>📅 Scheduling</span></div>
+            <div class="menu-item" onclick="switchTab('delivery-view', this)"><span>🚚 Deliveries</span></div>
+	    <div class="menu-item" onclick="switchTab('procurement-view', this)"><span>🛒 Procurement</span></div>
+            <div class="menu-item" onclick="switchTab('gatepass-view', this)"><span>🎫 Gate Pass</span></div>
+            <div class="menu-item" onclick="switchTab('deployed-view', this)"><span>🛠️ Deployed Equipments</span></div>
+            <div class="logout" onclick="location.reload()">Log Out</div>
+        </div>
+
+        <div id="dashboard-view" class="content-section active">
+            <h1>Operational Overview</h1>
+            <div class="stats-grid">
+                <div class="card"><h3>Total Assets</h3><p id="dash-total">0</p></div>
+                <div class="card"><h3>Active POs</h3><p id="dash-deliv">0</p></div>
+                <div class="card"><h3>Gate Pass Requests</h3><p id="dash-gp">0</p></div>
+            </div>
+
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <h3 id="calMonth" style="margin:0; font-size: 16px;">Schedule Overview</h3>
+                        <div class="filter-group" style="margin-bottom:0">
+                            <button class="btn-filter active" id="cal-filter-All" onclick="setCalFilter('All')">All</button>
+                            <button class="btn-filter" id="cal-filter-GatePass" onclick="setCalFilter('GatePass')">Gate Pass</button>
+                            <button class="btn-filter" id="cal-filter-Schedule" onclick="setCalFilter('Schedule')">Schedules</button>
+                        </div>
+                    </div>
+                    <div class="calendar-nav">
+                        <button class="calendar-btn" onclick="changeMonth(-1)">❮</button>
+                        <select id="calYearSelect" onchange="jumpDate()" style="padding:4px; border-radius:4px; border:1px solid var(--border-color);"></select>
+                        <button class="calendar-btn" onclick="changeMonth(1)">❯</button>
+                    </div>
+                </div>
+                <div class="calendar-grid" id="calendarGrid"></div>
+            </div>
+        </div>
+
+        <div id="scheduling-view" class="content-section">
+            <h1>Scheduling Management</h1>
+            <div class="form-panel">
+                <input type="text" id="schedTitle" placeholder="Event Title (e.g. Maintenance)">
+                <input type="date" id="schedDate" title="Event Date">
+                <input type="text" id="schedNote" placeholder="Notes/Remarks">
+                <button id="schedBtn" onclick="addSchedule()" class="btn-action" style="background:var(--accent-blue)">+ Add to Calendar</button>
+            </div>
+            <table>
+                <thead><tr><th>Event Title</th><th>Date</th><th>Notes</th><th>Action</th></tr></thead>
+                <tbody id="schedHistoryBody"></tbody>
+            </table>
+        </div>
+
+        <div id="inventory-list-view" class="content-section">
+            <h1>Inventory List</h1>
+            <input type="text" class="search-bar" id="invSearch" placeholder="Search Inventory..." onkeyup="renderAll()">
+            <table>
+                <thead><tr><th>Stock #</th><th>Item Name</th><th>Description</th><th>Location</th><th>Balance</th><th>Color</th><th>Category</th><th class="admin-only">Action</th></tr></thead>
+                <tbody id="invBody"></tbody>
+            </table>
+        </div>
+
+        <div id="inventory-reg-view" class="content-section">
+            <h1>Item Registry</h1>
+            <div class="form-panel">
+                <input type="text" id="iStock" placeholder="Stock Number"><input type="text" id="iName" placeholder="Item Name">
+                <input type="text" id="iDesc" placeholder="Description"><input type="text" id="iLoc" placeholder="Location">
+                <input type="number" id="iBal" placeholder="Balance"><input type="text" id="iCol" placeholder="Color"><input type="text" id="iCat" placeholder="Category">
+                <button onclick="addInv()" class="btn-action" style="background:var(--accent-blue)">+ Register</button>
+            </div>
+        </div>
+
+        <div id="delivery-view" class="content-section">
+            <h1>Deliveries</h1>
+            <div class="form-panel admin-only">
+                <input type="text" id="dPO" placeholder="PO Number"><input type="text" id="dItem" placeholder="Item">
+                <input type="number" id="dQty" placeholder="Quantity">
+                <input type="date" id="dProc" title="Date Procured"><input type="date" id="dArr" title="Arrival Date">
+                <input type="date" id="dInsp" title="Inspection Date"><input type="date" id="dRel" title="Released Date">
+                <input type="text" id="dRem" placeholder="Remarks">
+                <button onclick="addDeliv()" class="btn-action" style="background:var(--success-green)">+ Add Delivery</button>
+            </div>
+            <input type="text" class="search-bar" id="delSearch" placeholder="Search Deliveries..." onkeyup="renderAll()">
+            <div class="filter-group">
+                <button class="btn-filter active" id="filter-All" onclick="setFilter('All')">All</button>
+                <button class="btn-filter" id="filter-Pending" onclick="setFilter('Pending')">Pending</button>
+                <button class="btn-filter" id="filter-Complete" onclick="setFilter('Complete')">Complete</button>
+                <button class="btn-filter" id="filter-Unavailable" onclick="setFilter('Unavailable')">Unavailable</button>
+            </div>
+            <table>
+                <thead><tr><th>PO #</th><th>Item</th><th>Qty</th><th>Procured</th><th>Arrival</th><th>Inspection</th><th>Released</th><th>Status</th><th>Remarks</th><th class="admin-only">Action</th></tr></thead>
+                <tbody id="delivBody"></tbody>
+            </table>
+        </div>
+
+	<div id="procurement-view" class="content-section">
+    <h1>Procurement</h1>
+
+    <div class="form-panel">
+        <input type="text" id="pProject" placeholder="Project Name">
+        <input type="text" id="pItems" placeholder="Items">
+        <select id="pStatus" style="padding:10px; border:1px solid var(--border-color); border-radius:6px; font-size:12px;">
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Completed">Completed</option>
+        </select>
+        <button onclick="addProcurement()" class="btn-action" style="background:var(--accent-blue)">+ Add Record</button>
+    </div>
+
+    <input type="text" class="search-bar" id="procSearch" placeholder="Search Procurement..." onkeyup="renderAll()">
+
+    <div class="filter-group">
+        <button class="btn-filter active" id="proc-filter-All" onclick="setProcFilter('All')">All</button>
+        <span id="procProjectFilters"></span>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Project</th>
+                <th>Items</th>
+                <th>Status</th>
+                <th class="admin-only">Action</th>
+            </tr>
+        </thead>
+        <tbody id="procBody"></tbody>
+    </table>
+</div>
+
+        <div id="gatepass-view" class="content-section">
+            <h1>Gate Pass Request</h1>
+            <div class="form-panel"><input type="text" id="gpReq" placeholder="Requester Name"><input type="text" id="gpLoc" placeholder="Deployment Location"><input type="date" id="gpDate" title="Request Date"><input type="date" id="gpReturn" title="Return Date"></div>
+            <div style="display: flex; gap: 20px; align-items: flex-start;">
+                <div class="card" style="flex: 1.2;">
+                    <h3>Equipment List</h3>
+                    <input type="text" id="gpPickerSearch" class="search-bar" placeholder="Filter equipment..." onkeyup="renderGPUI()" style="width: 100%; margin-top: 10px;">
+                    <div style="max-height: 250px; overflow-y: auto; margin-top: 5px; border: 1px solid var(--border-color); border-radius: 8px;">
+                        <table><tbody id="gpPickerBody"></tbody></table>
+                    </div>
+                    <h3 style="margin-top: 20px;">Other Items</h3>
+                    <div style="display: flex; gap: 5px; margin-top: 10px;"><input type="number" id="customQty" placeholder="Qty" class="qty-mini" value="1"><input type="text" id="customItem" placeholder="Specify item if not on list..." style="flex: 1; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;"><button onclick="addCustomToCart()" class="btn-filter" style="background: var(--sidebar-bg); color: white;">+ Add</button></div>
+                </div>
+                <div class="card" style="flex: 0.8; border-top: 4px solid var(--accent-blue);">
+                    <h3>Request Cart</h3>
+                    <ul id="gpCartList" class="cart-list" style="margin-top: 15px;"><li style="color: #94a3b8;">No items added...</li></ul>
+                    <button onclick="submitGatePass()" class="btn-action" style="background: var(--primary-dark); width: 100%; margin-top: 20px;">Submit Request</button>
+                </div>
+            </div>
+            <h2 style="margin-top: 40px;">Request History</h2>
+            <table><thead><tr><th>Requester</th><th>Location</th><th>Items & Qty</th><th>Request Date</th><th>Return Date</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="gpHistoryBody"></tbody></table>
+        </div>
+
+        <div id="deployed-view" class="content-section">
+            <h1>Deployed Equipments</h1>
+            <div class="form-panel admin-only">
+                <input type="text" id="depLoc" placeholder="Location"><input type="number" id="depQty" placeholder="Quantity"><input type="text" id="depUnit" placeholder="Unit"><input type="text" id="depDesc" placeholder="Item Description"><input type="text" id="depProp" placeholder="Property Number"><input type="number" id="depVal" placeholder="Unit Value">
+                <button onclick="addDeployment()" class="btn-action" style="background:var(--warning-orange)">+ Record Deployment</button>
+            </div>
+            <h3>Deployment Locations</h3>
+            <div id="dep-location-grid" class="stats-grid"></div>
+            <h3 id="dep-list-title" style="margin-top:20px;">All Deployed Items</h3>
+            <input type="text" class="search-bar" id="depSearch" placeholder="Search Deployed..." onkeyup="renderAll()">
+            <table><thead><tr><th>Location</th><th>Quantity</th><th>Unit</th><th>Item Description</th><th>Property Number</th><th>Unit Value</th><th>Total Value</th><th>Action</th></tr></thead>
+            <tbody id="deployedBody"></tbody></table>
+        </div>
+    </div>
+
+    <script>
+        let currentUserRole = 'staff'; 
+        let inventory = JSON.parse(localStorage.getItem('rei_inv')) || [];
+        let deliveries = JSON.parse(localStorage.getItem('rei_deliv')) || [];
+        let gatepasses = JSON.parse(localStorage.getItem('rei_gp')) || [];
+        let deployments = JSON.parse(localStorage.getItem('rei_dep')) || [];
+        let schedules = JSON.parse(localStorage.getItem('rei_sched')) || [];
+        let notifications = JSON.parse(localStorage.getItem('rei_notifs')) || [];
+	let procurements = JSON.parse(localStorage.getItem('rei_proc')) || [];
+	let currentProcFilter = 'All';
+        let gpCart = [];
+        let currentStatusFilter = 'All';
+        let currentCalFilter = 'All';
+        let selectedDepLocation = 'All';
+        let schedEditIdx = -1;
+
+        let currentCalDate = new Date();
+
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+            const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: '2-digit' });
+            document.getElementById('clock-time').innerText = timeStr;
+            document.getElementById('clock-date').innerText = dateStr;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        function login() {
+            const user = userInput.value;
+            const pass = passInput.value;
+            if(user === "admin" && pass === "admin123") { currentUserRole = 'admin'; startApp(); }
+            else if(user === "staff" && pass === "staff123") { currentUserRole = 'staff'; startApp(); }
+            else { err.style.display = 'block'; }
+        }
+
+        function startApp() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'flex';
+            document.getElementById('live-clock').style.display = 'block'; 
+            const adminElements = document.querySelectorAll('.admin-only');
+            adminElements.forEach(el => {
+                el.style.display = (currentUserRole === 'admin') ? 'block' : 'none';
+                if(el.tagName === 'TH' || el.tagName === 'TD') el.style.display = (currentUserRole === 'admin') ? 'table-cell' : 'none';
+            });
+            initYearSelect();
+            renderAll();
+            updateNotifUI();
+        }
+
+        function toggleNotifs() {
+            const dd = document.getElementById('notif-dropdown');
+            dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
+            if(dd.style.display === 'block') clearBadge();
+        }
+
+        function clearBadge() {
+            const badge = document.getElementById('notif-badge');
+            badge.style.display = 'none';
+            notifications.forEach(n => { if(n.for === currentUserRole) n.read = true; });
+            localStorage.setItem('rei_notifs', JSON.stringify(notifications));
+        }
+
+        function clearAllNotifs() {
+            notifications = notifications.filter(n => n.for !== currentUserRole);
+            localStorage.setItem('rei_notifs', JSON.stringify(notifications));
+            updateNotifUI();
+        }
+
+        function addNotification(msg, targetRole) {
+            notifications.unshift({ msg, for: targetRole, read: false, time: new Date().toLocaleTimeString() });
+            localStorage.setItem('rei_notifs', JSON.stringify(notifications));
+            updateNotifUI();
+        }
+
+        function updateNotifUI() {
+            const list = document.getElementById('notif-list');
+            const badge = document.getElementById('notif-badge');
+            const myNotifs = notifications.filter(n => n.for === currentUserRole);
+            const unread = myNotifs.filter(n => !n.read).length;
+            if(unread > 0) { badge.innerText = unread; badge.style.display = 'block'; }
+            list.innerHTML = myNotifs.length ? myNotifs.map(n => `<div class="notif-item" style="background:${n.read ? 'transparent':'#f0f7ff'}">${n.msg} <br><small style="color:#94a3b8">${n.time}</small></div>`).join('') : '<div class="notif-item">No notifications</div>';
+        }
+
+        function addInv() {
+            const newItem = {
+                stock: iStock.value, name: iName.value, desc: iDesc.value, loc: iLoc.value,
+                bal: iBal.value, col: iCol.value, cat: iCat.value
+            };
+            inventory.push(newItem);
+            localStorage.setItem('rei_inv', JSON.stringify(inventory));
+            ['iStock','iName','iDesc','iLoc','iBal','iCol','iCat'].forEach(id => document.getElementById(id).value = '');
+            renderAll();
+        }
+
+        function addDeliv() {
+            const newDel = {
+                po: dPO.value, item: dItem.value, qty: dQty.value, proc: dProc.value,
+                arr: dArr.value, insp: dInsp.value, rel: dRel.value, status: 'Pending', remarks: dRem.value
+            };
+            deliveries.push(newDel);
+            localStorage.setItem('rei_deliv', JSON.stringify(deliveries));
+            ['dPO','dItem','dQty','dProc','dArr','dInsp','dRel','dRem'].forEach(id => document.getElementById(id).value = '');
+            renderAll();
+        }
+
+	function addProcurement() {
+    const project = document.getElementById('pProject').value;
+    const items = document.getElementById('pItems').value;
+    const status = document.getElementById('pStatus').value;
+    if(!project || !items) return;
+
+    procurements.push({ project, items, status });
+    localStorage.setItem('rei_proc', JSON.stringify(procurements));
+
+    ['pProject','pItems'].forEach(id => document.getElementById(id).value = '');
+    renderAll();
+}
+
+function setProcFilter(project) {
+    currentProcFilter = project;
+
+    document.querySelectorAll('#procurement-view .btn-filter').forEach(btn => btn.classList.remove('active'));
+    document.getElementById('proc-filter-' + project)?.classList.add('active');
+
+    renderAll();
+}
+
+function cycleProcStatus(index) {
+    if(currentUserRole !== 'admin') return;
+
+    const states = ['Pending', 'Approved', 'Completed'];
+    let current = states.indexOf(procurements[index].status);
+    procurements[index].status = states[(current + 1) % states.length];
+
+    localStorage.setItem('rei_proc', JSON.stringify(procurements));
+    renderAll();
+}
+
+        function addSchedule() {
+            const title = document.getElementById('schedTitle').value;
+            const date = document.getElementById('schedDate').value;
+            const notes = document.getElementById('schedNote').value;
+            if(!title || !date) return;
+            
+            if(schedEditIdx > -1) {
+                schedules[schedEditIdx] = { title, date, notes };
+                schedEditIdx = -1;
+                document.getElementById('schedBtn').innerText = "+ Add to Calendar";
+            } else {
+                schedules.push({ title, date, notes });
+            }
+            
+            localStorage.setItem('rei_sched', JSON.stringify(schedules));
+            ['schedTitle','schedDate','schedNote'].forEach(id => document.getElementById(id).value = '');
+            renderAll();
+        }
+
+        function editSched(idx) {
+            const s = schedules[idx];
+            document.getElementById('schedTitle').value = s.title;
+            document.getElementById('schedDate').value = s.date;
+            document.getElementById('schedNote').value = s.notes;
+            schedEditIdx = idx;
+            document.getElementById('schedBtn').innerText = "Update Entry";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function submitGatePass() {
+            const name = document.getElementById('gpReq').value;
+            const loc = document.getElementById('gpLoc').value;
+            if(!name || gpCart.length === 0) { alert("Requester Name and items required."); return; }
+            gatepasses.push({ requester: name, loc, date: document.getElementById('gpDate').value, return: document.getElementById('gpReturn').value, items: JSON.parse(JSON.stringify(gpCart)), status: 'Undone' });
+            if(currentUserRole === 'staff') addNotification(`<b>${name}</b> requested Gate Pass for <b>${loc}</b>`, 'admin');
+            gpCart = []; ['gpReq','gpLoc','gpDate','gpReturn'].forEach(id => document.getElementById(id).value = '');
+            localStorage.setItem('rei_gp', JSON.stringify(gatepasses));
+            renderAll();
+        }
+
+        function toggleGPStatus(idx) {
+            const gp = gatepasses[idx];
+            gp.status = (gp.status === 'Done') ? 'Undone' : 'Done';
+            if(gp.status === 'Done') addNotification(`Gate Pass for <b>${gp.loc}</b> has been marked <b>Done</b>.`, 'staff');
+            localStorage.setItem('rei_gp', JSON.stringify(gatepasses));
+            renderAll();
+        }
+
+        function toggleSub(id, el) { 
+            const submenu = document.getElementById(id); 
+            const isFlex = submenu.style.display === 'flex';
+            submenu.style.display = isFlex ? 'none' : 'flex'; 
+            el.classList.toggle('open', !isFlex);
+        }
+
+        function switchTab(id, el) { 
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active')); 
+            document.querySelectorAll('.menu-item, .sub-item').forEach(m => m.classList.remove('active')); 
+            document.getElementById(id).classList.add('active'); 
+            el.classList.add('active'); 
+            renderAll(); 
+        }
+
+        function openModal(title, content) { document.getElementById('modalTitle').innerText = title; document.getElementById('fullDescText').innerHTML = content; document.getElementById('descModal').style.display = 'flex'; }
+        
+        function cycleStatus(index) { if(currentUserRole !== 'admin') return; const states = ['Pending', 'Complete', 'Unavailable']; let current = states.indexOf(deliveries[index].status); deliveries[index].status = states[(current + 1) % states.length]; localStorage.setItem('rei_deliv', JSON.stringify(deliveries)); renderAll(); }
+        function updateRemarks(index, text) { if(currentUserRole !== 'admin') return; deliveries[index].remarks = text; localStorage.setItem('rei_deliv', JSON.stringify(deliveries)); }
+        
+        function setFilter(status) { 
+            currentStatusFilter = status; 
+            document.querySelectorAll('#delivery-view .btn-filter').forEach(btn => btn.classList.remove('active')); 
+            document.getElementById('filter-' + status).classList.add('active'); 
+            renderAll(); 
+        }
+
+        function setCalFilter(type) {
+            currentCalFilter = type;
+            document.querySelectorAll('.calendar-header .btn-filter').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('cal-filter-' + type).classList.add('active');
+            renderCalendar();
+        }
+
+        function toggleCartItem(itemName) { const idx = gpCart.findIndex(i => i.name === itemName); if(idx === -1) { const qtyInput = document.getElementById('qtyPicker-' + itemName); gpCart.push({ name: itemName, qty: qtyInput ? qtyInput.value : 1 }); } else { gpCart.splice(idx, 1); } renderGPUI(); }
+        function addCustomToCart() { const item = document.getElementById('customItem').value; const qty = document.getElementById('customQty').value || 1; if(item) { gpCart.push({ name: item + " (Custom)", qty: qty }); document.getElementById('customItem').value = ''; document.getElementById('customQty').value = '1'; renderGPUI(); } }
+        function deleteGP(idx) { if(confirm("Delete record?")) { gatepasses.splice(idx, 1); localStorage.setItem('rei_gp', JSON.stringify(gatepasses)); renderAll(); } }
+        function deleteSched(idx) { if(confirm("Delete schedule?")) { schedules.splice(idx, 1); localStorage.setItem('rei_sched', JSON.stringify(schedules)); renderAll(); } }
+        
+        function showGPEquipment(idx) { 
+            const gp = gatepasses[idx];
+            const items = gp.items; 
+            const listHtml = `
+                <div style="margin-bottom:15px; border-bottom:1px solid #e2e8f0; padding-bottom:10px;">
+                    <p><b>Requester:</b> ${gp.requester}</p>
+                    <p><b>Location:</b> ${gp.loc}</p>
+                    <p><b>Date:</b> ${gp.date} to ${gp.return}</p>
+                </div>
+                <p><b>Equipment List:</b></p>
+                <ul style="padding-left:20px; text-align:left;">` + items.map(i => `<li><b>${i.qty}x</b> ${i.name}</li>`).join('') + `</ul>`; 
+            openModal("Gate Pass Details", listHtml); 
+        }
+
+        function showSchedDetails(idx) {
+            const s = schedules[idx];
+            const content = `
+                <p><b>Title:</b> ${s.title}</p>
+                <p><b>Date:</b> ${s.date}</p>
+                <p><b>Notes:</b> ${s.notes || 'No extra notes'}</p>
+            `;
+            openModal("Schedule Details", content);
+        }
+
+        function renderGPUI() {
+            const query = document.getElementById('gpPickerSearch').value.toLowerCase();
+            document.getElementById('gpPickerBody').innerHTML = inventory.filter(item => item.name.toLowerCase().includes(query) || item.stock.toLowerCase().includes(query)).map(item => {
+                const inCart = gpCart.find(i => i.name === item.name);
+                return `<tr><td style="width: 40px; text-align: center;"><input type="checkbox" onchange="toggleCartItem('${item.name}')" ${inCart ? 'checked' : ''}></td><td><div style="display:flex; align-items:center; justify-content:space-between"><span>${item.name} <span style="font-size: 10px; color: #64748b;">[${item.stock}]</span></span><input type="number" id="qtyPicker-${item.name}" value="${inCart ? inCart.qty : 1}" class="qty-mini" onchange="if('${inCart}') updateCartQty('${item.name}', this.value)"></div></td></tr>`
+            }).join('');
+            document.getElementById('gpCartList').innerHTML = gpCart.length === 0 ? '<li style="color: #94a3b8;">No items added...</li>' : gpCart.map((item, idx) => `<li class="cart-item"><span><b>${item.qty}x</b> ${item.name}</span><span style="color: var(--danger-red); cursor: pointer;" onclick="gpCart.splice(${idx},1); renderGPUI();">✕</span></li>`).join('');
+            document.getElementById('gpHistoryBody').innerHTML = gatepasses.map((gp, idx) => {
+                const statusColor = gp.status === 'Done' ? '#dcfce7;color:#166534' : '#fee2e2;color:#991b1b';
+                return `<tr><td><b>${gp.requester}</b></td><td>${gp.loc}</td><td><span style="color:var(--accent-blue); cursor:pointer; text-decoration:underline" onclick="showGPEquipment(${idx})">View Items</span></td><td>${gp.date}</td><td>${gp.return}</td><td><span class="status-pill" style="background:${statusColor}" onclick="toggleGPStatus(${idx})">${gp.status || 'Undone'}</span></td><td><button class="btn-del" onclick="deleteGP(${idx})">X</button></td></tr>`
+            }).join('');
+        }
+
+        function initYearSelect() {
+            const select = document.getElementById('calYearSelect');
+            const startYear = 2024, endYear = 2030;
+            for(let y=startYear; y<=endYear; y++) {
+                const opt = document.createElement('option');
+                opt.value = y; opt.innerText = y;
+                if(y === currentCalDate.getFullYear()) opt.selected = true;
+                select.appendChild(opt);
+            }
+        }
+
+        function changeMonth(dir) {
+            currentCalDate.setMonth(currentCalDate.getMonth() + dir);
+            document.getElementById('calYearSelect').value = currentCalDate.getFullYear();
+            renderCalendar();
+        }
+
+        function jumpDate() {
+            currentCalDate.setFullYear(document.getElementById('calYearSelect').value);
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const month = currentCalDate.getMonth(), year = currentCalDate.getFullYear();
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            document.getElementById('calMonth').innerText = currentCalDate.toLocaleString('default', { month: 'long' });
+            grid.innerHTML = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => `<div class="calendar-day-head">${d}</div>`).join('');
+            
+            for(let i=0; i<firstDay; i++) grid.innerHTML += `<div></div>`;
+            for(let d=1; d<=daysInMonth; d++) {
+                const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                let outEvents = [], returnEvents = [], dayScheds = [];
+                if(currentCalFilter === 'All' || currentCalFilter === 'GatePass') {
+                    outEvents = gatepasses.filter(g => g.status === 'Done' && g.date === dateStr);
+                    returnEvents = gatepasses.filter(g => g.status === 'Done' && g.return === dateStr);
+                }
+                if(currentCalFilter === 'All' || currentCalFilter === 'Schedule') {
+                    dayScheds = schedules.filter(s => s.date === dateStr);
+                }
+                let labelsHtml = '';
+                
+                dayScheds.forEach(s => { 
+                    const idx = schedules.indexOf(s);
+                    labelsHtml += `<div class="cal-label label-sched" onclick="showSchedDetails(${idx})">${s.title}</div>`; 
+                });
+                outEvents.forEach(e => { 
+                    const idx = gatepasses.indexOf(e);
+                    labelsHtml += `<div class="cal-label label-out" onclick="showGPEquipment(${idx})">Out: ${e.requester}</div>`; 
+                });
+                returnEvents.forEach(e => { 
+                    const idx = gatepasses.indexOf(e);
+                    labelsHtml += `<div class="cal-label label-return" onclick="showGPEquipment(${idx})">Return: ${e.requester}</div>`; 
+                });
+
+                grid.innerHTML += `
+                    <div class="calendar-day ${(outEvents.length || returnEvents.length || dayScheds.length) ? 'bg-event' : ''}">
+                        <b>${d}</b>
+                        <div style="flex-grow:1; display:flex; flex-direction:column; gap:1px; margin-top:2px;">${labelsHtml}</div>
+                    </div>`;
+            }
+        }
+
+        function updateCartQty(name, newQty) { const item = gpCart.find(i => i.name === name); if(item) { item.qty = newQty; renderGPUI(); } }
+        function addDeployment() { if(currentUserRole !== 'admin') return; const q = parseFloat(document.getElementById('depQty').value) || 0, v = parseFloat(document.getElementById('depVal').value) || 0, loc = document.getElementById('depLoc').value, desc = document.getElementById('depDesc').value; if(!loc || !desc) return; deployments.push({ loc, qty: q, unit: document.getElementById('depUnit').value, desc, prop: document.getElementById('depProp').value, uVal: v, tVal: q * v }); ['depLoc','depQty','depUnit','depDesc','depProp','depVal'].forEach(id => document.getElementById(id).value = ''); localStorage.setItem('rei_dep', JSON.stringify(deployments)); renderAll(); }
+        function setDepFilter(loc) { selectedDepLocation = loc; renderAll(); }
+
+        function renderAll() {
+            document.getElementById('dash-total').innerText = inventory.length;
+            document.getElementById('dash-deliv').innerText = deliveries.filter(d => d.status === 'Pending').length;
+            document.getElementById('dash-gp').innerText = gatepasses.filter(gp => gp.status === 'Undone').length;
+            const invQuery = document.getElementById('invSearch').value.toLowerCase();
+            document.getElementById('invBody').innerHTML = inventory.filter(i => (i.name || '').toLowerCase().includes(invQuery) || (i.stock || '').toLowerCase().includes(invQuery)).map((item, idx) => `<tr><td>${item.stock}</td><td><b>${item.name}</b></td><td style="color:var(--accent-blue); cursor:pointer; text-decoration:underline" onclick="openModal('Item Description', '${item.desc}')">View Desc</td><td>${item.loc}</td><td>${item.bal}</td><td>${item.col}</td><td>${item.cat}</td><td class="${currentUserRole === 'admin' ? '' : 'admin-only'}"><button class="btn-del" onclick="inventory.splice(${idx},1);localStorage.setItem('rei_inv', JSON.stringify(inventory));renderAll()">X</button></td></tr>`).join('');
+            const delQuery = document.getElementById('delSearch').value.toLowerCase();
+            let fDel = deliveries.filter(d => (d.po || '').toLowerCase().includes(delQuery) || (d.item || '').toLowerCase().includes(delQuery));
+            if(currentStatusFilter !== 'All') fDel = fDel.filter(d => d.status === currentStatusFilter);
+            document.getElementById('delivBody').innerHTML = fDel.map((d) => {
+                const idx = deliveries.indexOf(d);
+                const colors = { 'Pending': '#fef9c3;color:#854d0e', 'Complete': '#dcfce7;color:#166534', 'Unavailable': '#fee2e2;color:#991b1b' };
+                return `<tr><td>${d.po}</td><td><b>${d.item}</b></td><td>${d.qty}</td><td>${d.proc}</td><td>${d.arr}</td><td>${d.insp}</td><td>${d.rel}</td><td><span class="status-pill" style="background:${colors[d.status]}" onclick="cycleStatus(${idx})">${d.status}</span></td><td><div class="editable-cell" ${currentUserRole === 'admin' ? 'contenteditable="true"' : ''} onblur="updateRemarks(${idx}, this.innerText)">${d.remarks || ''}</div></td><td class="${currentUserRole === 'admin' ? '' : 'admin-only'}"><button class="btn-del" onclick="deliveries.splice(${idx},1);localStorage.setItem('rei_deliv', JSON.stringify(deliveries));renderAll()">X</button></td></tr>`;
+            }).join('');
+            const uniqueLocs = [...new Set(deployments.map(d => d.loc))];
+            document.getElementById('dep-location-grid').innerHTML = `<div class="card clickable ${selectedDepLocation === 'All' ? 'active-card' : ''}" onclick="setDepFilter('All')"><h3>View All</h3><p>Locations</p></div>` + uniqueLocs.map(loc => `<div class="card clickable ${selectedDepLocation === loc ? 'active-card' : ''}" onclick="setDepFilter('${loc}')"><h3>${loc}</h3><p>${deployments.filter(d=>d.loc===loc).length}</p></div>`).join('');
+            const depQuery = document.getElementById('depSearch').value.toLowerCase();
+            document.getElementById('deployedBody').innerHTML = deployments.filter(d => (selectedDepLocation === 'All' || d.loc === selectedDepLocation) && (d.desc.toLowerCase().includes(depQuery) || d.prop.toLowerCase().includes(depQuery))).map((d, idx) => `<tr><td>${d.loc}</td><td>${d.qty}</td><td>${d.unit}</td><td>${d.desc}</td><td>${d.prop}</td><td>${d.uVal}</td><td>${d.tVal}</td><td><button class="btn-del" onclick="deployments.splice(${idx},1);localStorage.setItem('rei_dep', JSON.stringify(deployments));renderAll()">X</button></td></tr>`).join('');
+            document.getElementById('schedHistoryBody').innerHTML = schedules.map((s, idx) => `<tr><td><b>${s.title}</b></td><td>${s.date}</td><td>${s.notes}</td><td><button class="btn-edit" onclick="editSched(${idx})">✎</button><button class="btn-del" onclick="deleteSched(${idx})">X</button></td></tr>`).join('');
+            renderGPUI();
+            renderCalendar();
+// PROCUREMENT RENDER
+const procQuery = (document.getElementById('procSearch')?.value || '').toLowerCase();
+
+let filteredProc = procurements.filter(p =>
+    p.project.toLowerCase().includes(procQuery) ||
+    p.items.toLowerCase().includes(procQuery)
+);
+
+if(currentProcFilter !== 'All') {
+    filteredProc = filteredProc.filter(p => p.project === currentProcFilter);
+}
+
+const uniqueProjects = [...new Set(procurements.map(p => p.project))];
+
+const filterContainer = document.getElementById('procProjectFilters');
+if(filterContainer){
+    filterContainer.innerHTML = uniqueProjects.map(proj =>
+        `<button class="btn-filter ${currentProcFilter===proj?'active':''}" id="proc-filter-${proj}" onclick="setProcFilter('${proj}')">${proj}</button>`
+    ).join('');
+}
+
+const procBody = document.getElementById('procBody');
+if(procBody){
+    procBody.innerHTML = filteredProc.map((p, idx) => {
+        const statusColors = {
+            'Pending': '#fef9c3;color:#854d0e',
+            'Approved': '#dcfce7;color:#166534',
+            'Completed': '#dbeafe;color:#1e3a8a'
+        };
+        return `
+        <tr>
+            <td><b>${p.project}</b></td>
+            <td>${p.items}</td>
+            <td>
+                <span class="status-pill"
+                      style="background:${statusColors[p.status]}"
+                      onclick="cycleProcStatus(${idx})">
+                    ${p.status}
+                </span>
+            </td>
+            <td class="${currentUserRole === 'admin' ? '' : 'admin-only'}">
+                <button class="btn-del" onclick="procurements.splice(${idx},1);localStorage.setItem('rei_proc', JSON.stringify(procurements));renderAll()">X</button>
+            </td>
+        </tr>`;
+    }).join('');
+}
+        }
+    </script>
+</body>
+</html>
