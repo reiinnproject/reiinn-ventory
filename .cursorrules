@@ -1,11 +1,6 @@
----
-description: Use Conventional Commits for all git commits
-alwaysApply: true
----
-
 # Conventional Commits
 
-Use [Conventional Commits](https://www.conventionalcommits.org/) for all commit messages.
+Use [Conventional Commits](https://www.conventionalcommits.org/) for all git commit messages.
 
 ## Format
 
