@@ -4,10 +4,10 @@ overview: Restructure REIINN-ventory as a Vite + vanilla JS app with separate HT
 todos:
   - id: 1-1
     content: Run git init and create .gitignore (node_modules, dist, .env, .env.local, .vercel)
-    status: in_progress
+    status: completed
   - id: 1-2
     content: Create Vite project with vanilla template (npm create vite@latest)
-    status: pending
+    status: completed
   - id: 1-3
     content: Configure vite.config.js for multi-page build (index.html + app.html)
     status: pending

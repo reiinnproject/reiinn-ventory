@@ -19,9 +19,18 @@ git push -u origin main
 
 Replace `YOUR_USERNAME` with your GitHub username or organization.
 
-## Local Development (current)
+## Local Development
 
-Run the PowerShell server:
+**Vite (recommended - hot reload):**
+
+```bash
+npm install
+npm run dev
+```
+
+Then open http://localhost:5173 (login: admin/admin123 or staff/staff123)
+
+**Legacy PowerShell server:**
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\server.ps1

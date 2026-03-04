@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>REIINN-ventory | Portal</title>
+  <link rel="stylesheet" href="/src/styles/variables.css">
+  <link rel="stylesheet" href="/src/styles/layout.css">
+  <link rel="stylesheet" href="/src/styles/components.css">
+</head>
+<body>
+  <div id="live-clock">
+    <span id="clock-time">00:00:00 AM</span>
+    <span id="clock-date">Monday, January 01, 2026</span>
+  </div>
+  <div id="main-app">
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <span>REIINN-ventory</span>
+        <img src="/logo.png" class="sidebar-logo" alt="Logo">
+      </div>
+      <div class="menu-item active" data-route="dashboard">Dashboard</div>
+      <div class="menu-item" data-route="inventory">Inventory</div>
+      <div class="menu-item" data-route="scheduling">Scheduling</div>
+      <div class="menu-item" data-route="deliveries">Deliveries</div>
+      <div class="menu-item" data-route="procurement">Procurement</div>
+      <div class="menu-item" data-route="gatepass">Gate Pass</div>
+      <div class="menu-item" data-route="deployment">Deployed Equipments</div>
+      <div class="logout" onclick="location.href='/'">Log Out</div>
+    </div>
+    <div id="content-area" class="content-section"></div>
+  </div>
+  <script type="module" src="/src/app.js"></script>
+</body>
+</html>
