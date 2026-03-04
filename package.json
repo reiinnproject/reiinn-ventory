@@ -10,6 +10,9 @@
     "start": "npx serve -p 8080",
     "serve": "npx serve -p 8080"
   },
+  "dependencies": {
+    "mongodb": "^6.0.0"
+  },
   "devDependencies": {
     "vite": "^6.0.0"
   }

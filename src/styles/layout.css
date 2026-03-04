@@ -138,3 +138,18 @@ body {
   font-size: 28px;
   font-weight: 800;
 }
+
+.card.clickable {
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.card.clickable:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent-blue);
+}
+
+.card.active-card {
+  border: 2px solid var(--accent-blue);
+  background: #f0f7ff;
+}

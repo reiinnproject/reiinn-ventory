@@ -1,2 +1,42 @@
 <h1>Gate Pass Request</h1>
-<p style="color: #64748b;">Gate Pass view coming in Phase 2.</p>
+<div class="form-panel">
+  <input type="text" id="gpReq" placeholder="Requester Name">
+  <input type="text" id="gpLoc" placeholder="Deployment Location">
+  <input type="date" id="gpDate" title="Request Date">
+  <input type="date" id="gpReturn" title="Return Date">
+</div>
+<div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
+  <div class="card" style="flex: 1.2; min-width: 280px;">
+    <h3>Equipment List</h3>
+    <input type="text" id="gpPickerSearch" class="search-bar" placeholder="Filter equipment..." style="width: 100%; margin-top: 10px;">
+    <div style="max-height: 250px; overflow-y: auto; margin-top: 5px; border: 1px solid var(--border-color); border-radius: 8px;">
+      <table><tbody id="gpPickerBody"></tbody></table>
+    </div>
+    <h3 style="margin-top: 20px;">Other Items</h3>
+    <div style="display: flex; gap: 5px; margin-top: 10px;">
+      <input type="number" id="customQty" class="qty-mini" placeholder="Qty" value="1">
+      <input type="text" id="customItem" placeholder="Specify item if not on list..." style="flex: 1; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
+      <button id="gpCustomAddBtn" class="btn-filter" style="background: var(--sidebar-bg); color: white;">+ Add</button>
+    </div>
+  </div>
+  <div class="card" style="flex: 0.8; min-width: 240px; border-top: 4px solid var(--accent-blue);">
+    <h3>Request Cart</h3>
+    <ul id="gpCartList" class="cart-list" style="margin-top: 15px;"></ul>
+    <button id="gpSubmitBtn" class="btn-action" style="background: var(--primary-dark); width: 100%; margin-top: 20px;">Submit Request</button>
+  </div>
+</div>
+<h2 style="margin-top: 40px;">Request History</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Requester</th>
+      <th>Location</th>
+      <th>Items & Qty</th>
+      <th>Request Date</th>
+      <th>Return Date</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="gpHistoryBody"></tbody>
+</table>

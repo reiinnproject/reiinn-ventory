@@ -1,2 +1,27 @@
 <h1>Procurement</h1>
-<p style="color: #64748b;">Procurement view coming in Phase 2.</p>
+<div class="form-panel">
+  <input type="text" id="pProject" placeholder="Project Name">
+  <input type="text" id="pItems" placeholder="Items">
+  <select id="pStatus" style="padding:10px; border:1px solid var(--border-color); border-radius:6px; font-size:12px;">
+    <option value="Pending">Pending</option>
+    <option value="Approved">Approved</option>
+    <option value="Completed">Completed</option>
+  </select>
+  <button id="procAddBtn" class="btn-action" style="background:var(--accent-blue)">+ Add Record</button>
+</div>
+<input type="text" class="search-bar" id="procSearch" placeholder="Search Procurement...">
+<div class="filter-group" id="procFilterGroup">
+  <button class="btn-filter active" data-proc-filter="All">All</button>
+  <span id="procProjectFilters"></span>
+</div>
+<table>
+  <thead>
+    <tr>
+      <th>Project</th>
+      <th>Items</th>
+      <th>Status</th>
+      <th class="admin-only">Action</th>
+    </tr>
+  </thead>
+  <tbody id="procBody"></tbody>
+</table>

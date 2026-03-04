@@ -1,2 +1,18 @@
 <h1>Scheduling Management</h1>
-<p style="color: #64748b;">Scheduling view coming in Phase 2.</p>
+<div class="form-panel">
+  <input type="text" id="schedTitle" placeholder="Event Title (e.g. Maintenance)">
+  <input type="date" id="schedDate" title="Event Date">
+  <input type="text" id="schedNote" placeholder="Notes/Remarks">
+  <button id="schedBtn" class="btn-action" style="background:var(--accent-blue)">+ Add to Calendar</button>
+</div>
+<table>
+  <thead>
+    <tr>
+      <th>Event Title</th>
+      <th>Date</th>
+      <th>Notes</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="schedHistoryBody"></tbody>
+</table>

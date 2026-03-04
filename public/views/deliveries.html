@@ -1,2 +1,36 @@
 <h1>Deliveries</h1>
-<p style="color: #64748b;">Deliveries view coming in Phase 2.</p>
+<div class="form-panel admin-only">
+  <input type="text" id="dPO" placeholder="PO Number">
+  <input type="text" id="dItem" placeholder="Item">
+  <input type="number" id="dQty" placeholder="Quantity">
+  <input type="date" id="dProc" title="Date Procured">
+  <input type="date" id="dArr" title="Arrival Date">
+  <input type="date" id="dInsp" title="Inspection Date">
+  <input type="date" id="dRel" title="Released Date">
+  <input type="text" id="dRem" placeholder="Remarks">
+  <button id="delivAddBtn" class="btn-action" style="background:var(--success-green)">+ Add Delivery</button>
+</div>
+<input type="text" class="search-bar" id="delSearch" placeholder="Search Deliveries...">
+<div class="filter-group">
+  <button class="btn-filter active" data-deliv-filter="All">All</button>
+  <button class="btn-filter" data-deliv-filter="Pending">Pending</button>
+  <button class="btn-filter" data-deliv-filter="Complete">Complete</button>
+  <button class="btn-filter" data-deliv-filter="Unavailable">Unavailable</button>
+</div>
+<table>
+  <thead>
+    <tr>
+      <th>PO #</th>
+      <th>Item</th>
+      <th>Qty</th>
+      <th>Procured</th>
+      <th>Arrival</th>
+      <th>Inspection</th>
+      <th>Released</th>
+      <th>Status</th>
+      <th>Remarks</th>
+      <th class="admin-only">Action</th>
+    </tr>
+  </thead>
+  <tbody id="delivBody"></tbody>
+</table>

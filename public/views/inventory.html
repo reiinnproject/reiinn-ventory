@@ -1,2 +1,29 @@
 <h1>Inventory List</h1>
-<p style="color: #64748b;">Inventory view coming in Phase 2.</p>
+<input type="text" class="search-bar" id="invSearch" placeholder="Search Inventory...">
+<table>
+  <thead>
+    <tr>
+      <th>Stock #</th>
+      <th>Item Name</th>
+      <th>Description</th>
+      <th>Location</th>
+      <th>Balance</th>
+      <th>Color</th>
+      <th>Category</th>
+      <th class="admin-only">Action</th>
+    </tr>
+  </thead>
+  <tbody id="invBody"></tbody>
+</table>
+
+<h2 style="margin-top: 40px;">Item Registry</h2>
+<div class="form-panel admin-only">
+  <input type="text" id="iStock" placeholder="Stock Number">
+  <input type="text" id="iName" placeholder="Item Name">
+  <input type="text" id="iDesc" placeholder="Description">
+  <input type="text" id="iLoc" placeholder="Location">
+  <input type="number" id="iBal" placeholder="Balance">
+  <input type="text" id="iCol" placeholder="Color">
+  <input type="text" id="iCat" placeholder="Category">
+  <button id="invRegisterBtn" class="btn-action" style="background:var(--accent-blue)">+ Register</button>
+</div>

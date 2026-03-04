@@ -58,10 +58,10 @@ todos:
     status: completed
   - id: 3-4
     content: Create src/api.js with get/post/put/delete and Authorization header
-    status: pending
+    status: completed
   - id: 3-5
     content: Create src/auth.js (getToken, setToken, logout, isAuthenticated)
-    status: pending
+    status: completed
   - id: 3-6
     content: Create src/router.js with hash-based routing and view loading
     status: completed
@@ -73,31 +73,31 @@ todos:
     status: completed
   - id: 3-9
     content: Create src/modules/dashboard.js with init() and render logic
-    status: pending
+    status: completed
   - id: 3-10
     content: Create src/modules/inventory.js with init() and render logic
-    status: pending
+    status: completed
   - id: 3-11
     content: Create src/modules/scheduling.js with init() and render logic
-    status: pending
+    status: completed
   - id: 3-12
     content: Create src/modules/deliveries.js with init() and render logic
-    status: pending
+    status: completed
   - id: 3-13
     content: Create src/modules/procurement.js with init() and render logic
-    status: pending
+    status: completed
   - id: 3-14
     content: Create src/modules/gatepass.js with init() and render logic
-    status: pending
+    status: completed
   - id: 3-15
     content: Create src/modules/deployment.js with init() and render logic
-    status: pending
+    status: completed
   - id: 4-1
     content: Create MongoDB Atlas cluster and database reiinn_ventory
-    status: pending
+    status: completed
   - id: 4-2
     content: Create lib/db.js with connection caching and getDb() helper
-    status: pending
+    status: completed
   - id: 4-3
     content: Create api/auth/login.js (POST, validate credentials, return JWT)
     status: pending

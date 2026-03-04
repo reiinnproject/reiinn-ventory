@@ -1,2 +1,29 @@
 <h1>Deployed Equipments</h1>
-<p style="color: #64748b;">Deployment view coming in Phase 2.</p>
+<div class="form-panel admin-only">
+  <input type="text" id="depLoc" placeholder="Location">
+  <input type="number" id="depQty" placeholder="Quantity">
+  <input type="text" id="depUnit" placeholder="Unit">
+  <input type="text" id="depDesc" placeholder="Item Description">
+  <input type="text" id="depProp" placeholder="Property Number">
+  <input type="number" id="depVal" placeholder="Unit Value">
+  <button id="depAddBtn" class="btn-action" style="background:var(--warning-orange)">+ Record Deployment</button>
+</div>
+<h3>Deployment Locations</h3>
+<div id="dep-location-grid" class="stats-grid"></div>
+<h3 id="dep-list-title" style="margin-top:20px;">All Deployed Items</h3>
+<input type="text" class="search-bar" id="depSearch" placeholder="Search Deployed...">
+<table>
+  <thead>
+    <tr>
+      <th>Location</th>
+      <th>Quantity</th>
+      <th>Unit</th>
+      <th>Item Description</th>
+      <th>Property Number</th>
+      <th>Unit Value</th>
+      <th>Total Value</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="deployedBody"></tbody>
+</table>
