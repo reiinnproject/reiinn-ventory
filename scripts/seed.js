@@ -19,9 +19,9 @@ function loadEnv() {
   for (const p of paths) {
     if (existsSync(p)) {
       const content = readFileSync(p, 'utf8')
-      for (const line of content.split('\n')) {
+      for (const line of content.split(/\r?\n/)) {
         const m = line.match(/^([^#=]+)=(.*)$/)
-        if (m) process.env[m[1].trim()] = m[2].trim().replace(/^["']|["']$/g, '')
+        if (m) process.env[m[1].trim()] = m[2].trim().replace(/\r$/, '').replace(/^["']|["']$/g, '')
       }
       return
     }

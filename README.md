@@ -53,3 +53,13 @@ powershell -ExecutionPolicy Bypass -File .\server.ps1
 ```
 
 Then open http://localhost:8080/mylogin.html
+
+## Windows Setup
+
+When running on Windows (new clone or different machine):
+
+1. **Create `.env.local`** – It's gitignored, so copy from `.env.example` and add your `MONGODB_URI` and `JWT_SECRET`. Save with LF line endings if you have issues (e.g. in VS Code: bottom-right "CRLF" → "LF").
+
+2. **Use `npm run dev:full`** – The API only runs with `vercel dev`. `npm run dev` (Vite only) will show "Cannot reach server" on login.
+
+3. **Run seed first:** `npm run seed` – Creates admin/staff users in MongoDB.
