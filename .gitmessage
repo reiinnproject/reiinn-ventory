@@ -1,0 +1,7 @@
+# Conventional Commits - https://www.conventionalcommits.org/
+# Format: <type>(<scope>): <description>
+#
+# Types: feat, fix, docs, style, refactor, test, chore, build
+# Example: feat(auth): add login API endpoint
+# Example: fix: expose login function to window for ES module scope
+#
