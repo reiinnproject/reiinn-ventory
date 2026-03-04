@@ -6,14 +6,6 @@ Inventory management system for REIINN. Features: gate pass requests, scheduling
 
 Phase 1 complete: Repository setup with folder structure ready for Vite + MongoDB + Vercel.
 
-## Conventional Commits
-
-This project uses [Conventional Commits](https://www.conventionalcommits.org/). Format: `type(scope): description`
-
-**Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `build`
-
-To use the commit template: `git config commit.template .gitmessage`
-
 ## Connect to GitHub
 
 1. Create a new repository on [GitHub](https://github.com/new) (e.g. `reiinn-ventory`)
