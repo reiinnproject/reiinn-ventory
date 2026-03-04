@@ -1,4 +1,4 @@
-﻿---
+---
 name: REIINN-ventory Vite MongoDB Vercel
 overview: Restructure REIINN-ventory as a Vite + vanilla JS app with separate HTML view files, MongoDB backend via Vercel Serverless Functions, and a Git repository ready for Vercel deployment from the start.
 todos:
@@ -10,52 +10,52 @@ todos:
     status: completed
   - id: 1-3
     content: Configure vite.config.js for multi-page build (index.html + app.html)
-    status: pending
+    status: completed
   - id: 1-4
     content: Create folder structure (public/, public/views/, src/, src/modules/, src/styles/, api/, lib/)
-    status: pending
+    status: completed
   - id: 1-5
     content: Create vercel.json and .env.example
-    status: pending
+    status: completed
   - id: 2-1
     content: Create index.html with login form (logo, username, password, login button)
-    status: pending
+    status: completed
   - id: 2-2
     content: Create app.html with sidebar,
-    status: pending
+    status: completed
   - id: 2-3
     content: Extract dashboard view to public/views/dashboard.html
-    status: pending
+    status: completed
   - id: 2-4
     content: Extract inventory view (list + registry) to public/views/inventory.html
-    status: pending
+    status: completed
   - id: 2-5
     content: Extract scheduling view to public/views/scheduling.html
-    status: pending
+    status: completed
   - id: 2-6
     content: Extract deliveries view to public/views/deliveries.html
-    status: pending
+    status: completed
   - id: 2-7
     content: Extract procurement view to public/views/procurement.html
-    status: pending
+    status: completed
   - id: 2-8
     content: Extract gatepass view to public/views/gatepass.html
-    status: pending
+    status: completed
   - id: 2-9
     content: Extract deployment view to public/views/deployment.html
-    status: pending
+    status: completed
   - id: 2-10
     content: Copy logo.png to public/ and add descModal to app.html
-    status: pending
+    status: completed
   - id: 3-1
     content: Create src/styles/variables.css with :root tokens
-    status: pending
+    status: completed
   - id: 3-2
     content: Create src/styles/layout.css (body, sidebar, content-section, cards)
-    status: pending
+    status: completed
   - id: 3-3
     content: Create src/styles/components.css (forms, tables, modals, pills, buttons)
-    status: pending
+    status: completed
   - id: 3-4
     content: Create src/api.js with get/post/put/delete and Authorization header
     status: pending
@@ -64,13 +64,13 @@ todos:
     status: pending
   - id: 3-6
     content: Create src/router.js with hash-based routing and view loading
-    status: pending
+    status: completed
   - id: 3-7
     content: Create src/main.js for login page (form handler, redirect)
-    status: pending
+    status: completed
   - id: 3-8
     content: Create src/app.js (auth guard, router init, default view)
-    status: pending
+    status: completed
   - id: 3-9
     content: Create src/modules/dashboard.js with init() and render logic
     status: pending
@@ -127,13 +127,16 @@ todos:
     status: pending
   - id: 5-1
     content: Update vercel.json with buildCommand, outputDirectory, rewrites for multi-page
-    status: pending
+    status: completed
   - id: 5-2
     content: Add MONGODB_URI and JWT_SECRET to Vercel env vars and .env.local
     status: pending
   - id: 5-3
     content: Push project to GitHub and connect Vercel to repository
-    status: pending
+    status: completed
+  - id: 5-4
+    content: Add .cursorrules with conventional commits
+    status: completed
   - id: 6-1
     content: Replace localStorage with API calls in dashboard.js
     status: pending
@@ -504,6 +507,7 @@ Note: For multi-page (index.html + app.html), rewrites may need adjustment so `/
 - 5-1: Update vercel.json with buildCommand, outputDirectory, rewrites for multi-page
 - 5-2: Add MONGODB_URI and JWT_SECRET to Vercel env vars and .env.local
 - 5-3: Push project to GitHub and connect Vercel to repository
+- 5-4: Add .cursorrules with conventional commits
 
 ### Phase 6: Migration and Verification
 
