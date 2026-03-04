@@ -43,6 +43,12 @@ export default async function handler(req, res) {
     })
   } catch (err) {
     console.error('Login error:', err)
-    res.status(500).json({ error: err.message || 'Login failed' })
+    // Don't expose raw SSL/TLS errors to the client
+    const msg = err.message || ''
+    const safeError =
+      msg.includes('SSL') || msg.includes('TLS') || msg.includes('tlsv1') || msg.includes('ECONNREFUSED')
+        ? 'Database connection failed. Check Atlas Network Access (allow 0.0.0.0/0) and try again.'
+        : msg || 'Login failed'
+    res.status(500).json({ error: safeError })
   }
 }

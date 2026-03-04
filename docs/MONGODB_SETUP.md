@@ -83,3 +83,11 @@ If you still see connection errors:
    ```
 
 The app will use `MONGODB_URI_STANDARD` when set, bypassing the SRV format.
+
+## Vercel: SSL/TLS Connection Errors
+
+If you see `tlsv1 alert internal error` or `SSL routines` when deploying to Vercel:
+
+1. **Network Access**: In Atlas → **Network Access**, ensure you have **Allow Access from Anywhere** (`0.0.0.0/0`). Vercel serverless IPs change.
+2. **Standard connection string**: Try `MONGODB_URI_STANDARD` in Vercel env vars (from Atlas → Connect → Drivers → standard string). Sometimes the SRV format has TLS issues from serverless.
+3. **Retry**: These errors can be intermittent; try again after a few seconds.

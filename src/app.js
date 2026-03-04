@@ -1,5 +1,5 @@
 // Main app - auth guard, router, clock, modal
-import { logout } from './auth.js'
+import { logout, getUser, isAuthenticated } from './auth.js'
 
 const ROUTES = ['dashboard', 'inventory-list', 'inventory-registry', 'scheduling', 'deliveries', 'procurement', 'gatepass', 'deployment']
 
@@ -31,7 +31,7 @@ async function initNotifications() {
 }
 
 function toggleAdminElements() {
-  const user = JSON.parse(sessionStorage.getItem('rei_user') || 'null')
+  const user = getUser()
   const isAdmin = user?.role === 'admin'
   document.querySelectorAll('.admin-only').forEach((el) => {
     el.style.display = isAdmin ? (el.tagName === 'TH' || el.tagName === 'TD' ? 'table-cell' : 'block') : 'none'
@@ -39,9 +39,8 @@ function toggleAdminElements() {
 }
 
 function init() {
-  const user = sessionStorage.getItem('rei_user')
-  if (!user) {
-    window.location.href = '/'
+  if (!isAuthenticated() || !getUser()) {
+    window.location.replace('/')
     return
   }
 
@@ -71,7 +70,7 @@ function init() {
 function updateUserRoleDisplay() {
   const el = document.getElementById('user-role')
   if (!el) return
-  const user = JSON.parse(sessionStorage.getItem('rei_user') || 'null')
+  const user = getUser()
   const role = user?.role || 'staff'
   const username = user?.username
   el.textContent = username ? `${username} (${role})` : `Logged in as: ${role}`

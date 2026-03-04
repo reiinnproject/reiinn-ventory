@@ -5,6 +5,7 @@ const MESSAGES = {
   emptyPassword: 'Please enter your password.',
   invalidCredentials: 'Invalid username or password. Please try again.',
   serverError: 'Unable to connect. Make sure the server is running (npm run dev:full).',
+  timeoutError: 'Request timed out. The server may be slow or unreachable. Please try again.',
   unknownError: 'Something went wrong. Please try again.',
 }
 
@@ -91,18 +92,23 @@ window.login = async function login(ev) {
   setLoading(btn, true)
 
   try {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 15000)
     const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: user, password: pass }),
+      signal: controller.signal,
     })
+    clearTimeout(timeoutId)
     const data = await res.json().catch(() => ({}))
 
     if (res.ok) {
       const { setToken, setUser } = await import('./auth.js')
       setToken(data.token)
       setUser(data.user)
-      window.location.href = '/app.html'
+      // Use replace to avoid back-button returning to login
+      window.location.replace('/app.html')
       return
     }
 
@@ -114,7 +120,8 @@ window.login = async function login(ev) {
     setInputError(passInput)
     userInput?.focus()
   } catch (e) {
-    showMessage(message, MESSAGES.serverError)
+    const msg = e?.name === 'AbortError' ? MESSAGES.timeoutError : MESSAGES.serverError
+    showMessage(message, msg)
   } finally {
     setLoading(btn, false)
   }

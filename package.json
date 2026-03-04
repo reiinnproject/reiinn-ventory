@@ -1,6 +1,7 @@
 {
   "name": "reiinn-ventory",
   "version": "1.0.0",
+  "engines": { "node": ">=18" },
   "description": "REIINN-ventory portal - local server",
   "type": "module",
   "scripts": {
