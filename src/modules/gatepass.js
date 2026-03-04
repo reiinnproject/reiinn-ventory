@@ -4,6 +4,7 @@
  */
 
 import { getUser } from '../auth.js'
+import { addNotification } from './notifications.js'
 
 const STORAGE_KEY = 'rei_gp'
 const INV_KEY = 'rei_inv'
@@ -114,16 +115,18 @@ function renderHistory() {
 
   const gatepasses = getGatepasses()
 
+  const adminCanToggle = getUser()?.role === 'admin'
   body.innerHTML = gatepasses
     .map((gp, idx) => {
       const statusColor = gp.status === 'Done' ? '#dcfce7;color:#166534' : '#fee2e2;color:#991b1b'
+      const toggleStyle = adminCanToggle ? 'cursor:pointer' : 'cursor:default;pointer-events:none'
       return `<tr>
         <td><b>${escapeHtml(gp.requester || '')}</b></td>
         <td>${escapeHtml(gp.loc || '')}</td>
         <td><span style="color:var(--accent-blue); cursor:pointer; text-decoration:underline" data-view-idx="${idx}">View Items</span></td>
         <td>${escapeHtml(gp.date || '')}</td>
         <td>${escapeHtml(gp.return || '')}</td>
-        <td><span class="status-pill" style="background:${statusColor}" data-toggle-idx="${idx}">${escapeHtml(gp.status || 'Undone')}</span></td>
+        <td><span class="status-pill" style="background:${statusColor};${toggleStyle}" data-toggle-idx="${idx}">${escapeHtml(gp.status || 'Undone')}</span></td>
         <td><button class="btn-del" data-del-idx="${idx}">X</button></td>
       </tr>`
     })
@@ -138,12 +141,17 @@ function renderHistory() {
 
   body.querySelectorAll('[data-toggle-idx]').forEach((el) => {
     el.addEventListener('click', () => {
+      if (getUser()?.role !== 'admin') return
       const idx = parseInt(el.dataset.toggleIdx, 10)
       const gatepasses = getGatepasses()
       const gp = gatepasses[idx]
       if (gp) {
+        const wasUndone = gp.status !== 'Done'
         gp.status = gp.status === 'Done' ? 'Undone' : 'Done'
         saveGatepasses(gatepasses)
+        if (wasUndone && gp.status === 'Done') {
+          addNotification(`Gate Pass for <b>${gp.loc || 'N/A'}</b> has been marked <b>Done</b>.`, 'staff')
+        }
         renderHistory()
       }
     })
@@ -213,6 +221,10 @@ function submitGatePass() {
     status: 'Undone',
   })
   saveGatepasses(gatepasses)
+
+  if (getUser()?.role === 'staff') {
+    addNotification(`<b>${name}</b> requested Gate Pass for <b>${loc || 'N/A'}</b>`, 'admin')
+  }
 
   gpCart = []
   ;['gpReq', 'gpLoc', 'gpDate', 'gpReturn'].forEach((id) => {

@@ -1,7 +1,9 @@
 /**
  * Dashboard module - stats and calendar
- * Uses localStorage until API is available (Phase 6)
+ * Uses localStorage; tries API for inventory count when available
  */
+
+import { api } from '../api.js'
 
 let currentCalDate = new Date()
 let currentCalFilter = 'All'
@@ -15,8 +17,19 @@ function getData() {
   }
 }
 
-function renderStats() {
-  const { inventory, deliveries, gatepasses } = getData()
+async function renderStats() {
+  let inventory = getData().inventory
+  try {
+    const items = await api.get('/api/inventory')
+    if (Array.isArray(items)) {
+      inventory = items
+      localStorage.setItem('rei_inv', JSON.stringify(items))
+    }
+  } catch {
+    // Use localStorage fallback
+  }
+
+  const { deliveries, gatepasses } = getData()
   const dashTotal = document.getElementById('dash-total')
   const dashDeliv = document.getElementById('dash-deliv')
   const dashGp = document.getElementById('dash-gp')
@@ -163,8 +176,9 @@ function bindEvents() {
 }
 
 export function init() {
-  renderStats()
-  initYearSelect()
-  renderCalendar()
-  bindEvents()
+  renderStats().then(() => {
+    initYearSelect()
+    renderCalendar()
+    bindEvents()
+  })
 }

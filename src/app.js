@@ -1,9 +1,12 @@
 // Main app - auth guard, router, clock, modal
-const ROUTES = ['dashboard', 'inventory', 'scheduling', 'deliveries', 'procurement', 'gatepass', 'deployment']
+import { logout } from './auth.js'
+
+const ROUTES = ['dashboard', 'inventory-list', 'inventory-registry', 'scheduling', 'deliveries', 'procurement', 'gatepass', 'deployment']
 
 const MODULES = {
   dashboard: () => import('./modules/dashboard.js'),
-  inventory: () => import('./modules/inventory.js'),
+  'inventory-list': () => import('./modules/inventory.js'),
+  'inventory-registry': () => import('./modules/inventory.js'),
   scheduling: () => import('./modules/scheduling.js'),
   deliveries: () => import('./modules/deliveries.js'),
   procurement: () => import('./modules/procurement.js'),
@@ -20,6 +23,19 @@ window.openModal = function (title, content) {
     contentEl.innerHTML = content
     modal.style.display = 'flex'
   }
+}
+
+async function initNotifications() {
+  const { initNotifications } = await import('./modules/notifications.js')
+  initNotifications()
+}
+
+function toggleAdminElements() {
+  const user = JSON.parse(sessionStorage.getItem('rei_user') || 'null')
+  const isAdmin = user?.role === 'admin'
+  document.querySelectorAll('.admin-only').forEach((el) => {
+    el.style.display = isAdmin ? (el.tagName === 'TH' || el.tagName === 'TD' ? 'table-cell' : 'block') : 'none'
+  })
 }
 
 function init() {
@@ -43,8 +59,22 @@ function init() {
   updateClock()
   setInterval(updateClock, 1000)
 
+  document.querySelector('.logout')?.addEventListener('click', logout)
+
+  updateUserRoleDisplay()
+  initNotifications()
   initRouter()
   initNav()
+  toggleAdminElements()
+}
+
+function updateUserRoleDisplay() {
+  const el = document.getElementById('user-role')
+  if (!el) return
+  const user = JSON.parse(sessionStorage.getItem('rei_user') || 'null')
+  const role = user?.role || 'staff'
+  const username = user?.username
+  el.textContent = username ? `${username} (${role})` : `Logged in as: ${role}`
 }
 
 function updateClock() {
@@ -58,22 +88,50 @@ function updateClock() {
 }
 
 function initRouter() {
-  const hash = window.location.hash.slice(2) || 'dashboard'
+  let hash = window.location.hash.slice(2) || 'dashboard'
+  if (hash === 'inventory') hash = 'inventory-list'
   const route = ROUTES.includes(hash) ? hash : 'dashboard'
+
   document.querySelectorAll('.menu-item').forEach((m) => {
     m.classList.toggle('active', m.getAttribute('data-route') === route)
   })
+  document.querySelectorAll('.sub-item').forEach((m) => {
+    m.classList.toggle('active', m.getAttribute('data-route') === route)
+  })
+
+  const invMenu = document.getElementById('inv-menu')
+  const invSub = document.getElementById('inv-submenu')
+  if (route === 'inventory-list' || route === 'inventory-registry') {
+    invMenu?.classList.add('active', 'open')
+    invSub?.classList.add('open')
+  } else {
+    invMenu?.classList.remove('open')
+    invSub?.classList.remove('open')
+  }
+
   loadView(route)
 }
 
 function initNav() {
   document.querySelectorAll('.menu-item[data-route]').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      const route = el.getAttribute('data-route')
+      if (route === 'inventory') {
+        e.stopPropagation()
+        const invSub = document.getElementById('inv-submenu')
+        const invMenu = document.getElementById('inv-menu')
+        invSub?.classList.toggle('open')
+        invMenu?.classList.toggle('open')
+        return
+      }
+      window.location.hash = '#/' + route
+    })
+  })
+
+  document.querySelectorAll('.sub-item[data-route]').forEach((el) => {
     el.addEventListener('click', () => {
       const route = el.getAttribute('data-route')
-      window.location.hash = route
-      document.querySelectorAll('.menu-item').forEach((m) => m.classList.remove('active'))
-      el.classList.add('active')
-      loadView(route)
+      window.location.hash = '#/' + route
     })
   })
 
@@ -104,6 +162,8 @@ async function loadView(route) {
       // Module not implemented yet
     }
   }
+
+  toggleAdminElements()
 }
 
 init()

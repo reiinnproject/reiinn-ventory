@@ -16,17 +16,40 @@
   <div id="main-app">
     <div class="sidebar">
       <div class="sidebar-header">
-        <span>REIINN-ventory</span>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div class="notif-wrapper" id="notifWrapper">
+            <span class="notif-bell">🔔</span>
+            <span id="notif-badge" class="notif-badge">0</span>
+            <div id="notif-dropdown" class="notif-dropdown" onclick="event.stopPropagation()">
+              <div class="notif-header">
+                Notifications
+                <button class="btn-clear-notif" id="notifClearAll">Clear All</button>
+              </div>
+              <div id="notif-list"></div>
+            </div>
+          </div>
+          <span style="font-size: 16px; letter-spacing: 0.5px;">REIINN-ventory</span>
+        </div>
         <img src="/logo.png" class="sidebar-logo" alt="Logo">
       </div>
-      <div class="menu-item active" data-route="dashboard">Dashboard</div>
-      <div class="menu-item" data-route="inventory">Inventory</div>
-      <div class="menu-item" data-route="scheduling">Scheduling</div>
-      <div class="menu-item" data-route="deliveries">Deliveries</div>
-      <div class="menu-item" data-route="procurement">Procurement</div>
-      <div class="menu-item" data-route="gatepass">Gate Pass</div>
-      <div class="menu-item" data-route="deployment">Deployed Equipments</div>
-      <div class="logout" onclick="location.href='/'">Log Out</div>
+      <div class="menu-item active" data-route="dashboard"><span>📊 Dashboard</span></div>
+      <div class="menu-item" id="inv-menu" data-route="inventory">
+        <span>📦 Inventory</span>
+        <svg class="menu-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div id="inv-submenu" class="submenu">
+        <div class="sub-item" data-route="inventory-list">Inventory List</div>
+        <div class="sub-item admin-only" data-route="inventory-registry">Inventory Registry</div>
+      </div>
+      <div class="menu-item" data-route="scheduling"><span>📅 Scheduling</span></div>
+      <div class="menu-item" data-route="deliveries"><span>🚚 Deliveries</span></div>
+      <div class="menu-item" data-route="procurement"><span>🛒 Procurement</span></div>
+      <div class="menu-item" data-route="gatepass"><span>🎫 Gate Pass</span></div>
+      <div class="menu-item" data-route="deployment"><span>🛠️ Deployed Equipment</span></div>
+      <div class="sidebar-footer">
+        <span id="user-role" class="user-role"></span>
+        <div class="logout">Log Out</div>
+      </div>
     </div>
     <div id="content-area" class="content-section"></div>
   </div>
