@@ -8,6 +8,7 @@ import { MongoClient } from 'mongodb'
 import { readFileSync, existsSync } from 'fs'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
+import { getMongoUri, getMongoClientOptions } from '../lib/mongodb-uri.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -30,7 +31,7 @@ function loadEnv() {
 
 loadEnv()
 
-const uri = process.env.MONGODB_URI
+const uri = getMongoUri()
 if (!uri) {
   console.error('MONGODB_URI not set. Create .env.local from .env.example and add your connection string.')
   process.exit(1)
@@ -42,7 +43,7 @@ const users = [
 ]
 
 async function seed() {
-  const client = new MongoClient(uri)
+  const client = new MongoClient(uri, getMongoClientOptions())
   try {
     await client.connect()
     const db = client.db()

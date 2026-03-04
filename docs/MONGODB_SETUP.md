@@ -67,3 +67,19 @@
 1. Copy `.env.example` to `.env.local`
 2. Set `MONGODB_URI` to your connection string
 3. Add `MONGODB_URI` to Vercel Environment Variables for production
+
+## Windows: Connection Issues (querySrv ECONNREFUSED / ENOTFOUND)
+
+The app applies a Windows fix automatically: Cloudflare/Google DNS, IPv4-first, and `family: 4` for MongoClient. This resolves most `querySrv ECONNREFUSED` and `getaddrinfo ENOTFOUND` errors.
+
+If you still see connection errors:
+
+1. Go to [MongoDB Atlas](https://cloud.mongodb.com) → **Database** → **Connect** on your cluster
+2. Choose **Drivers** → **Node.js**
+3. Copy the **standard** connection string (starts with `mongodb://`, not `mongodb+srv://`)
+4. Add to `.env.local`:
+   ```
+   MONGODB_URI_STANDARD=mongodb://username:password@cluster0-shard-00-00.xxxxx.mongodb.net:27017,.../reiinn_ventory?ssl=true&replicaSet=...&authSource=admin
+   ```
+
+The app will use `MONGODB_URI_STANDARD` when set, bypassing the SRV format.

@@ -125,6 +125,9 @@ todos:
   - id: 4-11
     content: Seed users collection with admin and staff accounts
     status: completed
+  - id: 4-12
+    content: MongoDB Windows connection fix (DNS + IPv4) - see plan section
+    status: completed
   - id: 5-1
     content: Update vercel.json with buildCommand, outputDirectory, rewrites for multi-page
     status: completed
@@ -393,6 +396,115 @@ Use `mongodb` npm package (no Mongoose for simplicity). Auth: simple JWT (e.g. `
 
 ---
 
+## MongoDB Windows Connection Fix (Critical)
+
+> **Context:** MongoDB Atlas connections work on macOS/Linux but fail on Windows with `querySrv ECONNREFUSED` or `getaddrinfo ENOTFOUND cluster0-shard-00-00.xxxxx.mongodb.net`. This section documents the root cause and the implemented solution.
+
+### Problem Summary
+
+
+| Error                                                            | Meaning                                             |
+| ---------------------------------------------------------------- | --------------------------------------------------- |
+| `querySrv ECONNREFUSED _mongodb._tcp.cluster0.xxxxx.mongodb.net` | DNS SRV lookup failed before any connection attempt |
+| `getaddrinfo ENOTFOUND cluster0-shard-00-00.xxxxx.mongodb.net`   | Hostname resolution failed (A/AAAA record lookup)   |
+
+
+Both errors occur **only on Windows**, not on macOS or Linux.
+
+### Root Cause
+
+1. **Node.js uses c-ares on Windows** for DNS resolution instead of the system resolver. The c-ares library has known issues on Windows:
+  - Incorrect nameserver sorting (prioritizes secondary over primary)
+  - Can fall back to `127.0.0.1` when the network is briefly unavailable, causing persistent `ECONNREFUSED` even after the network recovers
+  - SRV record lookups may fail when the Windows system resolver would succeed
+2. **Node.js v17+ prefers IPv6** when both IPv4 and IPv6 are available. If the network or MongoDB Atlas uses IPv4, the connection can fail with `ECONNREFUSED` on an IPv6 address.
+3. **Node.js bug (fixed in v25.6.1):** "dns: fix Windows SRV ECONNREFUSED regression by correcting c-ares fallback detection" ([Node.js PR #61453](https://github.com/nodejs/node/pull/61453)). Older Node versions on Windows are affected.
+
+### Solution Implemented
+
+The fix is applied automatically when running on Windows (`platform() === 'win32'`). No configuration required.
+
+#### 1. Force Public DNS Servers
+
+Before any MongoDB connection, Node's DNS resolver is configured to use Cloudflare and Google DNS instead of the system resolver:
+
+```javascript
+import dns from 'node:dns'
+
+if (platform() === 'win32') {
+  dns.setServers(['1.1.1.1', '8.8.8.8'])
+}
+```
+
+- **1.1.1.1** (Cloudflare) and **8.8.8.8** (Google) are reliable public DNS servers
+- This bypasses c-ares' broken interaction with the Windows system DNS
+- Must run **before** any MongoDB connection (at module load time in `lib/mongodb-uri.js`)
+
+#### 2. Prefer IPv4 for DNS Results
+
+```javascript
+dns.setDefaultResultOrder('ipv4first')
+```
+
+- Node.js v17+ defaults to IPv6 when both are available
+- `ipv4first` ensures IPv4 addresses are tried first, avoiding IPv6-related connection failures
+
+#### 3. Force IPv4 in MongoClient
+
+```javascript
+MongoClient.connect(uri, { family: 4 })
+```
+
+- The `family: 4` option tells the MongoDB driver to use IPv4 only
+- Prevents `ECONNREFUSED` when Node resolves to an IPv6 address that MongoDB doesn't accept
+
+### Files Modified
+
+
+| File                    | Change                                                                                                                                                                                 |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `lib/mongodb-uri.js`    | New file. Sets `dns.setServers` and `dns.setDefaultResultOrder` on Windows at import time. Exports `getMongoUri()` and `getMongoClientOptions()` (returns `{ family: 4 }` on Windows). |
+| `lib/db.js`             | Imports `getMongoUri` and `getMongoClientOptions`; passes options to `MongoClient.connect(uri, options)`.                                                                              |
+| `scripts/seed.js`       | Imports `getMongoClientOptions`; passes to `new MongoClient(uri, getMongoClientOptions())`.                                                                                            |
+| `docs/MONGODB_SETUP.md` | Documents the automatic Windows fix and the `MONGODB_URI_STANDARD` fallback.                                                                                                           |
+
+
+### Fallback: MONGODB_URI_STANDARD
+
+If the automatic fix still fails (e.g., corporate firewall blocks public DNS), use the **standard** connection string from MongoDB Atlas:
+
+1. Go to [MongoDB Atlas](https://cloud.mongodb.com) → **Database** → **Connect** on your cluster
+2. Choose **Drivers** → **Node.js**
+3. Copy the **standard** connection string (starts with `mongodb://`, not `mongodb+srv://`)
+4. Add to `.env.local`:
+
+```
+   MONGODB_URI_STANDARD=mongodb://user:pass@cluster0-shard-00-00.xxxxx.mongodb.net:27017,.../reiinn_ventory?ssl=true&replicaSet=...&authSource=admin
+   
+
+```
+
+The app uses `MONGODB_URI_STANDARD` when set, bypassing the SRV format entirely.
+
+### Verification
+
+Run `npm run seed` on Windows. Success output:
+
+```
+Created user: admin (admin)
+Created user: staff (staff)
+Seed complete.
+```
+
+### References
+
+- [Stack Overflow: MongoDB Atlas SRV connection fails with querySrv ECONNREFUSED (Node 22, Windows)](https://stackoverflow.com/questions/79873598/mongodb-atlas-srv-connection-fails-with-querysrv-econnrefused-after-switching-no)
+- [Alex Bevilacqua: querySrv errors when connecting to MongoDB Atlas](https://www.alexbevi.com/blog/2023/11/13/querysrv-errors-when-connecting-to-mongodb-atlas/)
+- [MongoDB Node.js Driver: Connection Troubleshooting](https://www.mongodb.com/docs/drivers/node/current/connect/connection-troubleshooting/)
+- [Node.js PR #61453: dns: fix Windows SRV ECONNREFUSED regression](https://github.com/nodejs/node/pull/61453)
+
+---
+
 ## Phase 5: Vercel Deployment
 
 ### 5.1 vercel.json (Optional)
@@ -501,6 +613,7 @@ Note: For multi-page (index.html + app.html), rewrites may need adjustment so `/
 - 4-9: Create api/deployments.js (GET, POST) and api/deployments/[id].js (DELETE)
 - 4-10: Create api/notifications.js (GET, POST, PATCH)
 - 4-11: Seed users collection with admin and staff accounts
+- 4-12: MongoDB Windows connection fix (lib/mongodb-uri.js, dns.setServers, family: 4)
 
 ### Phase 5: Vercel Deployment
 
@@ -536,7 +649,7 @@ Note: For multi-page (index.html + app.html), rewrites may need adjustment so `/
 | Create         | `src/modules/*.js` (7 modules)                                            |
 | Create         | `src/styles/*.css` (3 files)                                              |
 | Create         | `api/**/*.js` (auth + 6 entity endpoints)                                 |
-| Create         | `lib/db.js`                                                               |
+| Create         | `lib/db.js`, `lib/mongodb-uri.js` (Windows DNS fix)                       |
 | Create         | `vercel.json`, `.gitignore`, `.env.example`                               |
 | Migrate        | Logo from current project to `public/logo.png`                            |
 | Remove/Archive | `mylogin.html` (after migration), `server.ps1`                            |
