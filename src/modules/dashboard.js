@@ -1,19 +1,29 @@
 /**
  * Dashboard module - stats and calendar
- * Uses localStorage; tries API for inventory count when available
+ * Uses API for inventory and gate passes; localStorage for deliveries/schedules
  */
 
 import { api } from '../api.js'
 
 let currentCalDate = new Date()
 let currentCalFilter = 'All'
+let gatepassesCache = []
 
 function getData() {
   return {
     inventory: JSON.parse(localStorage.getItem('rei_inv') || '[]'),
     deliveries: JSON.parse(localStorage.getItem('rei_deliv') || '[]'),
-    gatepasses: JSON.parse(localStorage.getItem('rei_gp') || '[]'),
+    gatepasses: gatepassesCache,
     schedules: JSON.parse(localStorage.getItem('rei_sched') || '[]'),
+  }
+}
+
+async function fetchGatepasses() {
+  try {
+    const list = await api.get('/api/gatepasses')
+    gatepassesCache = Array.isArray(list) ? list : []
+  } catch {
+    gatepassesCache = []
   }
 }
 
@@ -29,6 +39,7 @@ async function renderStats() {
     // Use localStorage fallback
   }
 
+  await fetchGatepasses()
   const { deliveries, gatepasses } = getData()
   const dashTotal = document.getElementById('dash-total')
   const dashDeliv = document.getElementById('dash-deliv')
@@ -89,11 +100,13 @@ function renderCalendar() {
     dayScheds.forEach((s, idx) => {
       labelsHtml += `<div class="cal-label label-sched" data-sched-idx="${schedules.indexOf(s)}">${s.title}</div>`
     })
-    outEvents.forEach((e, idx) => {
-      labelsHtml += `<div class="cal-label label-out" data-gp-idx="${gatepasses.indexOf(e)}">Out: ${e.requester}</div>`
+    outEvents.forEach((e) => {
+      const idx = gatepasses.indexOf(e)
+      labelsHtml += `<div class="cal-label label-out" data-gp-idx="${idx}">Out: ${e.requester}</div>`
     })
     returnEvents.forEach((e) => {
-      labelsHtml += `<div class="cal-label label-return" data-gp-idx="${gatepasses.indexOf(e)}">Return: ${e.requester}</div>`
+      const idx = gatepasses.indexOf(e)
+      labelsHtml += `<div class="cal-label label-return" data-gp-idx="${idx}">Return: ${e.requester}</div>`
     })
 
     const hasEvents = outEvents.length || returnEvents.length || dayScheds.length

@@ -1,27 +1,29 @@
 /**
  * Gate Pass module - request equipment, cart, history
- * Uses localStorage until API is available (Phase 6)
+ * Uses API (MongoDB) for cross-device sync
  */
 
 import { getUser } from '../auth.js'
 import { addNotification } from './notifications.js'
+import { api } from '../api.js'
 
-const STORAGE_KEY = 'rei_gp'
 const INV_KEY = 'rei_inv'
-
-function getGatepasses() {
-  return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
-}
 
 function getInventory() {
   return JSON.parse(localStorage.getItem(INV_KEY) || '[]')
 }
 
-function saveGatepasses(gatepasses) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(gatepasses))
+async function getGatepasses() {
+  try {
+    const list = await api.get('/api/gatepasses')
+    return Array.isArray(list) ? list : []
+  } catch {
+    return []
+  }
 }
 
 let gpCart = []
+let gatepassesCache = []
 
 function escapeHtml(s) {
   const div = document.createElement('div')
@@ -109,62 +111,70 @@ function renderCart() {
   })
 }
 
-function renderHistory() {
+async function renderHistory() {
   const body = document.getElementById('gpHistoryBody')
   if (!body) return
 
-  const gatepasses = getGatepasses()
+  body.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#64748b;">Loading...</td></tr>'
+  gatepassesCache = await getGatepasses()
 
   const adminCanToggle = getUser()?.role === 'admin'
-  body.innerHTML = gatepasses
-    .map((gp, idx) => {
+  const adminCanDelete = adminCanToggle
+  body.innerHTML = gatepassesCache
+    .map((gp) => {
+      const id = gp._id || ''
       const statusColor = gp.status === 'Done' ? '#dcfce7;color:#166534' : '#fee2e2;color:#991b1b'
       const toggleStyle = adminCanToggle ? 'cursor:pointer' : 'cursor:default;pointer-events:none'
+      const delBtn = adminCanDelete
+        ? `<button class="btn-del" data-del-id="${id}">X</button>`
+        : '<span style="color:#94a3b8;">—</span>'
       return `<tr>
         <td><b>${escapeHtml(gp.requester || '')}</b></td>
         <td>${escapeHtml(gp.loc || '')}</td>
-        <td><span style="color:var(--accent-blue); cursor:pointer; text-decoration:underline" data-view-idx="${idx}">View Items</span></td>
+        <td><span style="color:var(--accent-blue); cursor:pointer; text-decoration:underline" data-view-id="${id}">View Items</span></td>
         <td>${escapeHtml(gp.date || '')}</td>
         <td>${escapeHtml(gp.return || '')}</td>
-        <td><span class="status-pill" style="background:${statusColor};${toggleStyle}" data-toggle-idx="${idx}">${escapeHtml(gp.status || 'Undone')}</span></td>
-        <td><button class="btn-del" data-del-idx="${idx}">X</button></td>
+        <td><span class="status-pill" style="background:${statusColor};${toggleStyle}" data-toggle-id="${id}">${escapeHtml(gp.status || 'Undone')}</span></td>
+        <td>${delBtn}</td>
       </tr>`
     })
     .join('')
 
-  body.querySelectorAll('[data-view-idx]').forEach((el) => {
+  body.querySelectorAll('[data-view-id]').forEach((el) => {
     el.addEventListener('click', () => {
-      const gp = gatepasses[parseInt(el.dataset.viewIdx, 10)]
+      const gp = gatepassesCache.find((g) => g._id === el.dataset.viewId)
       if (gp) showGPDetails(gp)
     })
   })
 
-  body.querySelectorAll('[data-toggle-idx]').forEach((el) => {
-    el.addEventListener('click', () => {
+  body.querySelectorAll('[data-toggle-id]').forEach((el) => {
+    el.addEventListener('click', async () => {
       if (getUser()?.role !== 'admin') return
-      const idx = parseInt(el.dataset.toggleIdx, 10)
-      const gatepasses = getGatepasses()
-      const gp = gatepasses[idx]
-      if (gp) {
-        const wasUndone = gp.status !== 'Done'
-        gp.status = gp.status === 'Done' ? 'Undone' : 'Done'
-        saveGatepasses(gatepasses)
-        if (wasUndone && gp.status === 'Done') {
+      const id = el.dataset.toggleId
+      const gp = gatepassesCache.find((g) => g._id === id)
+      if (!gp) return
+      const newStatus = gp.status === 'Done' ? 'Undone' : 'Done'
+      try {
+        await api.put(`/api/gatepasses/${id}`, { status: newStatus })
+        if (newStatus === 'Done') {
           addNotification(`Gate Pass for <b>${gp.loc || 'N/A'}</b> has been marked <b>Done</b>.`, 'staff')
         }
-        renderHistory()
+        await renderHistory()
+      } catch (err) {
+        alert(err?.body?.error || 'Failed to update status')
       }
     })
   })
 
-  body.querySelectorAll('[data-del-idx]').forEach((el) => {
-    el.addEventListener('click', () => {
-      const idx = parseInt(el.dataset.delIdx, 10)
-      if (confirm('Delete record?')) {
-        const gatepasses = getGatepasses()
-        gatepasses.splice(idx, 1)
-        saveGatepasses(gatepasses)
-        renderHistory()
+  body.querySelectorAll('[data-del-id]').forEach((el) => {
+    el.addEventListener('click', async () => {
+      if (!confirm('Delete record?')) return
+      const id = el.dataset.delId
+      try {
+        await api.delete(`/api/gatepasses/${id}`)
+        await renderHistory()
+      } catch (err) {
+        alert(err?.body?.error || 'Failed to delete')
       }
     })
   })
@@ -200,7 +210,7 @@ function addCustomItem() {
   renderUI()
 }
 
-function submitGatePass() {
+async function submitGatePass() {
   const name = document.getElementById('gpReq')?.value?.trim()
   const loc = document.getElementById('gpLoc')?.value?.trim()
   const date = document.getElementById('gpDate')?.value ?? ''
@@ -211,28 +221,31 @@ function submitGatePass() {
     return
   }
 
-  const gatepasses = getGatepasses()
-  gatepasses.push({
-    requester: name,
-    loc,
-    date,
-    return: returnDate,
-    items: JSON.parse(JSON.stringify(gpCart)),
-    status: 'Undone',
-  })
-  saveGatepasses(gatepasses)
+  try {
+    await api.post('/api/gatepasses', {
+      requester: name,
+      loc,
+      date,
+      return: returnDate,
+      items: JSON.parse(JSON.stringify(gpCart)),
+    })
 
-  if (getUser()?.role === 'staff') {
-    addNotification(`<b>${name}</b> requested Gate Pass for <b>${loc || 'N/A'}</b>`, 'admin')
+    if (getUser()?.role === 'staff') {
+      addNotification(`<b>${name}</b> requested Gate Pass for <b>${loc || 'N/A'}</b>`, 'admin')
+    }
+
+    gpCart = []
+    ;['gpReq', 'gpLoc', 'gpDate', 'gpReturn'].forEach((id) => {
+      const el = document.getElementById(id)
+      if (el) el.value = ''
+    })
+
+    await renderHistory()
+    renderPicker()
+    renderCart()
+  } catch (err) {
+    alert(err?.body?.error || 'Failed to submit gate pass')
   }
-
-  gpCart = []
-  ;['gpReq', 'gpLoc', 'gpDate', 'gpReturn'].forEach((id) => {
-    const el = document.getElementById(id)
-    if (el) el.value = ''
-  })
-
-  renderUI()
 }
 
 function bindEvents() {
