@@ -30,12 +30,24 @@ export function getNotificationsForRole(role) {
   return notificationsCache.filter((n) => n.for === role)
 }
 
+function showToast(message, type = 'error') {
+  const existing = document.getElementById('notif-toast')
+  if (existing) existing.remove()
+  const toast = document.createElement('div')
+  toast.id = 'notif-toast'
+  toast.textContent = message
+  toast.style.cssText = `position:fixed;bottom:20px;right:20px;padding:12px 20px;background:${type === 'error' ? '#dc2626' : '#16a34a'};color:white;border-radius:8px;font-size:14px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.15);`
+  document.body.appendChild(toast)
+  setTimeout(() => toast.remove(), 3000)
+}
+
 export async function addNotification(msg, targetRole) {
   try {
     await api.post('/api/notifications', { msg, for: targetRole })
     await refreshAndUpdate()
   } catch (err) {
     console.warn('Failed to add notification:', err)
+    showToast('Could not send notification. Check connection.')
   }
 }
 
@@ -104,7 +116,7 @@ function startPolling() {
   if (pollInterval) return
   pollInterval = setInterval(async () => {
     await refreshAndUpdate()
-  }, 15000)
+  }, 5000)
 }
 
 function stopPolling() {
@@ -114,9 +126,26 @@ function stopPolling() {
   }
 }
 
+function onVisibilityChange() {
+  if (document.visibilityState === 'visible') {
+    refreshAndUpdate()
+  }
+}
+
+function onRouteChange() {
+  const hash = window.location.hash.slice(2) || 'dashboard'
+  const route = hash === 'inventory' ? 'inventory-list' : hash
+  if (route === 'dashboard' || route === 'gatepass') {
+    refreshAndUpdate()
+  }
+}
+
 export async function initNotifications() {
   await refreshAndUpdate()
   startPolling()
+
+  document.addEventListener('visibilitychange', onVisibilityChange)
+  window.addEventListener('hashchange', onRouteChange)
 
   document.getElementById('notifWrapper')?.addEventListener('click', (e) => {
     e.stopPropagation()

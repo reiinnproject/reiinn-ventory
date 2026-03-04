@@ -27,7 +27,7 @@ window.openModal = function (title, content) {
 
 async function initNotifications() {
   const { initNotifications } = await import('./modules/notifications.js')
-  initNotifications()
+  await initNotifications()
 }
 
 function toggleAdminElements() {
@@ -38,7 +38,7 @@ function toggleAdminElements() {
   })
 }
 
-function init() {
+async function init() {
   if (!isAuthenticated() || !getUser()) {
     window.location.replace('/')
     return
@@ -61,7 +61,7 @@ function init() {
   document.querySelector('.logout')?.addEventListener('click', logout)
 
   updateUserRoleDisplay()
-  initNotifications()
+  await initNotifications()
   initRouter()
   initNav()
   toggleAdminElements()
@@ -165,4 +165,4 @@ async function loadView(route) {
   toggleAdminElements()
 }
 
-init()
+init().catch(() => {})
