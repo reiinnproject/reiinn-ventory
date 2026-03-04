@@ -157,7 +157,7 @@ async function renderHistory() {
       try {
         await api.put(`/api/gatepasses/${id}`, { status: newStatus })
         if (newStatus === 'Done') {
-          addNotification(`Gate Pass for <b>${gp.loc || 'N/A'}</b> has been marked <b>Done</b>.`, 'staff')
+          await addNotification(`Gate Pass for <b>${gp.loc || 'N/A'}</b> has been marked <b>Done</b>.`, 'staff')
         }
         await renderHistory()
       } catch (err) {
@@ -231,7 +231,7 @@ async function submitGatePass() {
     })
 
     if (getUser()?.role === 'staff') {
-      addNotification(`<b>${name}</b> requested Gate Pass for <b>${loc || 'N/A'}</b>`, 'admin')
+      await addNotification(`<b>${name}</b> requested Gate Pass for <b>${loc || 'N/A'}</b>`, 'admin')
     }
 
     gpCart = []

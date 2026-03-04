@@ -1,37 +1,12 @@
 /**
  * Notifications - bell dropdown, badge, clear.
- * Uses localStorage (rei_notifs) until API is available.
+ * Uses API (MongoDB) for cross-device sync.
  */
 
-const STORAGE_KEY = 'rei_notifs'
+import { api } from '../api.js'
 
-function getNotifications() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
-  } catch {
-    return []
-  }
-}
-
-function saveNotifications(notifications) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications))
-}
-
-export function getNotificationsForRole(role) {
-  return getNotifications().filter((n) => n.for === role)
-}
-
-export function addNotification(msg, targetRole) {
-  const notifications = getNotifications()
-  notifications.unshift({
-    msg,
-    for: targetRole,
-    read: false,
-    time: new Date().toLocaleTimeString(),
-  })
-  saveNotifications(notifications)
-  updateNotifUI()
-}
+let notificationsCache = []
+let pollInterval = null
 
 function getCurrentRole() {
   try {
@@ -40,6 +15,33 @@ function getCurrentRole() {
   } catch {
     return 'staff'
   }
+}
+
+async function fetchNotifications() {
+  try {
+    const list = await api.get('/api/notifications')
+    notificationsCache = Array.isArray(list) ? list : []
+  } catch {
+    notificationsCache = []
+  }
+}
+
+export function getNotificationsForRole(role) {
+  return notificationsCache.filter((n) => n.for === role)
+}
+
+export async function addNotification(msg, targetRole) {
+  try {
+    await api.post('/api/notifications', { msg, for: targetRole })
+    await refreshAndUpdate()
+  } catch (err) {
+    console.warn('Failed to add notification:', err)
+  }
+}
+
+async function refreshAndUpdate() {
+  await fetchNotifications()
+  updateNotifUI()
 }
 
 function updateNotifUI() {
@@ -62,29 +64,32 @@ function updateNotifUI() {
     ? myNotifs
         .map(
           (n) =>
-            `<div class="notif-item" style="background:${n.read ? 'transparent' : '#f0f7ff'}">${n.msg}<br><small style="color:#94a3b8">${n.time}</small></div>`
+            `<div class="notif-item" style="background:${n.read ? 'transparent' : '#f0f7ff'}">${n.msg}<br><small style="color:#94a3b8">${n.time || ''}</small></div>`
         )
         .join('')
     : '<div class="notif-item">No notifications</div>'
 }
 
-function clearBadge() {
+async function clearBadge() {
   const badge = document.getElementById('notif-badge')
   if (badge) badge.style.display = 'none'
 
-  const role = getCurrentRole()
-  const notifications = getNotifications()
-  notifications.forEach((n) => {
-    if (n.for === role) n.read = true
-  })
-  saveNotifications(notifications)
+  try {
+    await api.put('/api/notifications')
+    await refreshAndUpdate()
+  } catch {
+    // Fallback: just update UI from cache
+    updateNotifUI()
+  }
 }
 
-function clearAllNotifs() {
-  const role = getCurrentRole()
-  const notifications = getNotifications().filter((n) => n.for !== role)
-  saveNotifications(notifications)
-  updateNotifUI()
+async function clearAllNotifs() {
+  try {
+    await api.delete('/api/notifications')
+    await refreshAndUpdate()
+  } catch (err) {
+    console.warn('Failed to clear notifications:', err)
+  }
 }
 
 function toggleNotifs() {
@@ -95,8 +100,23 @@ function toggleNotifs() {
   if (!isOpen) clearBadge()
 }
 
-export function initNotifications() {
-  updateNotifUI()
+function startPolling() {
+  if (pollInterval) return
+  pollInterval = setInterval(async () => {
+    await refreshAndUpdate()
+  }, 15000)
+}
+
+function stopPolling() {
+  if (pollInterval) {
+    clearInterval(pollInterval)
+    pollInterval = null
+  }
+}
+
+export async function initNotifications() {
+  await refreshAndUpdate()
+  startPolling()
 
   document.getElementById('notifWrapper')?.addEventListener('click', (e) => {
     e.stopPropagation()
@@ -113,4 +133,4 @@ export function initNotifications() {
   })
 }
 
-export { updateNotifUI }
+export { updateNotifUI, refreshAndUpdate }
