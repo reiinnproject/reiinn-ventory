@@ -1,17 +1,29 @@
 /**
  * Inventory module - list and registry
- * Uses localStorage until API is available (Phase 6)
+ * Uses MongoDB API when available, falls back to localStorage
  */
 
 import { getUser } from '../auth.js'
+import { api } from '../api.js'
 
 const STORAGE_KEY = 'rei_inv'
 
-function getInventory() {
+async function loadInventory() {
+  try {
+    const items = await api.get('/api/inventory')
+    const arr = Array.isArray(items) ? items : []
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(arr))
+    return arr
+  } catch {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
+  }
+}
+
+function getLocalInventory() {
   return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
 }
 
-function saveInventory(items) {
+function saveLocalInventory(items) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
 }
 
@@ -20,12 +32,12 @@ function isAdmin() {
   return user?.role === 'admin'
 }
 
-function renderList() {
+async function renderList() {
   const invBody = document.getElementById('invBody')
   const invSearch = document.getElementById('invSearch')
   if (!invBody) return
 
-  const inventory = getInventory()
+  const inventory = await loadInventory()
   const query = (invSearch?.value || '').toLowerCase()
   const filtered = inventory.filter(
     (i) =>
@@ -42,7 +54,7 @@ function renderList() {
 
   invBody.innerHTML = filtered
     .map((item) => {
-      const realIdx = inventory.indexOf(item)
+      const id = item._id || inventory.indexOf(item)
       const descSafe = escapeHtml(item.desc || '')
       return `<tr>
         <td>${escapeHtml(item.stock || '')}</td>
@@ -52,7 +64,7 @@ function renderList() {
         <td>${escapeHtml(String(item.bal ?? ''))}</td>
         <td>${escapeHtml(item.col || '')}</td>
         <td>${escapeHtml(item.cat || '')}</td>
-        <td class="${adminClass}"><button class="btn-del" data-idx="${realIdx}">X</button></td>
+        <td class="${adminClass}"><button class="btn-del" data-id="${id}">X</button></td>
       </tr>`
     })
     .join('')
@@ -63,20 +75,27 @@ function renderList() {
     })
   })
 
-  invBody.querySelectorAll('.btn-del[data-idx]').forEach((el) => {
-    el.addEventListener('click', () => {
-      const idx = parseInt(el.dataset.idx, 10)
-      if (confirm('Delete this item?')) {
-        const inventory = getInventory()
-        inventory.splice(idx, 1)
-        saveInventory(inventory)
+  invBody.querySelectorAll('.btn-del[data-id]').forEach((el) => {
+    el.addEventListener('click', async () => {
+      const id = el.dataset.id
+      if (!confirm('Delete this item?')) return
+      try {
+        await api.delete(`/api/inventory?id=${id}`)
         renderList()
+      } catch {
+        const inventory = getLocalInventory()
+        const idx = parseInt(id, 10)
+        if (!isNaN(idx) && idx >= 0) {
+          inventory.splice(idx, 1)
+          saveLocalInventory(inventory)
+          renderList()
+        }
       }
     })
   })
 }
 
-function addItem() {
+async function addItem() {
   if (!isAdmin()) return
 
   const stock = document.getElementById('iStock')?.value?.trim()
@@ -89,16 +108,23 @@ function addItem() {
 
   if (!stock || !name) return
 
-  const inventory = getInventory()
-  inventory.push({ stock, name, desc, loc, bal, col, cat })
-  saveInventory(inventory)
-
-  ;['iStock', 'iName', 'iDesc', 'iLoc', 'iBal', 'iCol', 'iCat'].forEach((id) => {
-    const el = document.getElementById(id)
-    if (el) el.value = ''
-  })
-
-  renderList()
+  try {
+    await api.post('/api/inventory', { stock, name, desc, loc, bal, col, cat })
+    ;['iStock', 'iName', 'iDesc', 'iLoc', 'iBal', 'iCol', 'iCat'].forEach((id) => {
+      const el = document.getElementById(id)
+      if (el) el.value = ''
+    })
+    renderList()
+  } catch {
+    const inventory = getLocalInventory()
+    inventory.push({ stock, name, desc, loc, bal, col, cat })
+    saveLocalInventory(inventory)
+    ;['iStock', 'iName', 'iDesc', 'iLoc', 'iBal', 'iCol', 'iCat'].forEach((id) => {
+      const el = document.getElementById(id)
+      if (el) el.value = ''
+    })
+    renderList()
+  }
 }
 
 function toggleAdminElements() {

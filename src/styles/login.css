@@ -1,0 +1,233 @@
+/* Login screen - enhanced UX */
+#login-screen {
+  background: white;
+  padding: 48px 40px;
+  border-radius: 16px;
+  width: 380px;
+  max-width: 90vw;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  text-align: center;
+}
+
+.login-logo {
+  max-width: 120px;
+  margin-bottom: 16px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.login-title {
+  margin: 0 0 4px;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--primary-dark);
+  letter-spacing: -0.02em;
+}
+
+.login-subtitle {
+  margin: 0 0 28px;
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.login-form {
+  text-align: left;
+}
+
+/* Input groups */
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 15px;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: #fff;
+}
+
+.input-group input::placeholder {
+  color: #94a3b8;
+}
+
+.input-group input:hover {
+  border-color: #cbd5e1;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.input-group input.error {
+  border-color: var(--danger-red);
+  background: #fef2f2;
+}
+
+.input-group input.error:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+/* Password input with toggle */
+.input-password-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-password-wrap input {
+  padding-right: 48px;
+}
+
+.btn-password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: #64748b;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+}
+
+.btn-password-toggle:hover {
+  color: var(--accent-blue);
+  background: #f1f5f9;
+}
+
+.btn-password-toggle:focus {
+  outline: none;
+  color: var(--accent-blue);
+}
+
+.btn-password-toggle .icon-eye-off {
+  display: none;
+}
+
+.btn-password-toggle[aria-pressed="true"] .icon-eye {
+  display: none;
+}
+
+.btn-password-toggle[aria-pressed="true"] .icon-eye-off {
+  display: block;
+}
+
+/* Message area */
+.login-message {
+  min-height: 20px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  line-height: 1.4;
+  transition: opacity 0.2s;
+}
+
+.login-message:empty {
+  display: none;
+}
+
+.login-message.error {
+  color: var(--danger-red);
+  padding: 10px 12px;
+  background: #fef2f2;
+  border-radius: 8px;
+  border: 1px solid #fecaca;
+}
+
+.login-message.success {
+  color: var(--success-green);
+  padding: 10px 12px;
+  background: #f0fdf4;
+  border-radius: 8px;
+  border: 1px solid #bbf7d0;
+}
+
+/* Login button */
+.btn-login {
+  width: 100%;
+  padding: 14px 20px;
+  background: var(--primary-dark);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  position: relative;
+}
+
+.btn-login:hover:not(:disabled) {
+  background: #1e293b;
+}
+
+.btn-login:active:not(:disabled) {
+  transform: scale(0.99);
+}
+
+.btn-login:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.3);
+}
+
+.btn-login:disabled {
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+.btn-login .btn-loading {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-login.loading .btn-text {
+  visibility: hidden;
+}
+
+.btn-login.loading .btn-loading {
+  display: flex;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Spinner */
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

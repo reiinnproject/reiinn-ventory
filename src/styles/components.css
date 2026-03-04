@@ -1,36 +1,4 @@
-#login-screen {
-  background: white;
-  padding: 50px;
-  border-radius: 12px;
-  width: 360px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  text-align: center;
-}
-
-.login-logo {
-  max-width: 140px;
-  margin-bottom: 20px;
-}
-
-#login-screen input {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 15px;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  box-sizing: border-box;
-}
-
-.btn-login {
-  width: 100%;
-  padding: 12px;
-  background: var(--primary-dark);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-}
+/* Login styles moved to login.css */
 
 .form-panel {
   background: white;

@@ -19,12 +19,28 @@ git push -u origin main
 
 Replace `YOUR_USERNAME` with your GitHub username or organization.
 
+## MongoDB Setup
+
+1. Create a free cluster at [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) (see [docs/MONGODB_SETUP.md](docs/MONGODB_SETUP.md) for details)
+2. Copy `.env.example` to `.env.local` and set your `MONGODB_URI` and `JWT_SECRET`
+3. Run `npm run seed` to create admin/staff users (admin/admin123, staff/staff123)
+4. For production: add `MONGODB_URI` and `JWT_SECRET` to Vercel Environment Variables
+
 ## Local Development
 
-**Vite (recommended - hot reload):**
+**Full-stack (Vite + API + MongoDB):**
 
 ```bash
 npm install
+npm run seed          # First time: seed users
+npm run dev:full      # Runs vercel dev - frontend + API
+```
+
+Then open http://localhost:3000 (login: admin/admin123 or staff/staff123)
+
+**Frontend only (no API, uses localStorage fallback):**
+
+```bash
 npm run dev
 ```
 

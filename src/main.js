@@ -1,17 +1,127 @@
-// Login page - Phase 1: temporary hardcoded auth (will use API in Phase 6)
-// Expose to window so onclick="login()" in HTML can find it (ES modules are scoped)
-window.login = function login() {
-  const user = document.getElementById('userInput').value
-  const pass = document.getElementById('passInput').value
-  const err = document.getElementById('err')
+// Login page - authenticates against MongoDB via /api/auth/login
 
-  if (user === 'admin' && pass === 'admin123') {
-    sessionStorage.setItem('rei_user', JSON.stringify({ role: 'admin' }))
-    window.location.href = '/app.html'
-  } else if (user === 'staff' && pass === 'staff123') {
-    sessionStorage.setItem('rei_user', JSON.stringify({ role: 'staff' }))
-    window.location.href = '/app.html'
-  } else {
-    err.style.display = 'block'
+const MESSAGES = {
+  emptyUsername: 'Please enter your username.',
+  emptyPassword: 'Please enter your password.',
+  invalidCredentials: 'Invalid username or password. Please try again.',
+  serverError: 'Unable to connect. Make sure the server is running (npm run dev:full).',
+  unknownError: 'Something went wrong. Please try again.',
+}
+
+function showMessage(el, text, type = 'error') {
+  el.textContent = text
+  el.className = `login-message ${type}`
+  el.style.display = 'block'
+}
+
+function hideMessage(el) {
+  el.textContent = ''
+  el.className = 'login-message'
+  el.style.display = 'none'
+}
+
+function setLoading(btn, loading) {
+  btn.disabled = loading
+  btn.classList.toggle('loading', loading)
+}
+
+function clearInputError(input) {
+  input?.classList.remove('error')
+}
+
+function setInputError(input) {
+  input?.classList.add('error')
+}
+
+function initPasswordToggle() {
+  const toggle = document.getElementById('togglePassword')
+  const input = document.getElementById('passInput')
+  if (!toggle || !input) return
+
+  toggle.addEventListener('click', () => {
+    const isVisible = input.type === 'text'
+    input.type = isVisible ? 'password' : 'text'
+    toggle.setAttribute('aria-pressed', !isVisible)
+    toggle.setAttribute('aria-label', isVisible ? 'Show password' : 'Hide password')
+    toggle.setAttribute('title', isVisible ? 'Show password' : 'Hide password')
+  })
+}
+
+function initClearMessageOnInput() {
+  const form = document.getElementById('loginForm')
+  const message = document.getElementById('message')
+  if (!form || !message) return
+
+  form.addEventListener('input', () => {
+    hideMessage(message)
+    clearInputError(document.getElementById('userInput'))
+    clearInputError(document.getElementById('passInput'))
+  })
+}
+
+window.login = async function login(ev) {
+  if (ev) ev.preventDefault()
+
+  const userInput = document.getElementById('userInput')
+  const passInput = document.getElementById('passInput')
+  const message = document.getElementById('message')
+  const btn = document.getElementById('btnLogin')
+
+  const user = userInput?.value?.trim() ?? ''
+  const pass = passInput?.value ?? ''
+
+  hideMessage(message)
+  clearInputError(userInput)
+  clearInputError(passInput)
+
+  if (!user) {
+    showMessage(message, MESSAGES.emptyUsername)
+    setInputError(userInput)
+    userInput?.focus()
+    return
+  }
+
+  if (!pass) {
+    showMessage(message, MESSAGES.emptyPassword)
+    setInputError(passInput)
+    passInput?.focus()
+    return
+  }
+
+  setLoading(btn, true)
+
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: user, password: pass }),
+    })
+    const data = await res.json().catch(() => ({}))
+
+    if (res.ok) {
+      const { setToken, setUser } = await import('./auth.js')
+      setToken(data.token)
+      setUser(data.user)
+      window.location.href = '/app.html'
+      return
+    }
+
+    const msg = res.status === 401
+      ? MESSAGES.invalidCredentials
+      : (data.error || MESSAGES.unknownError)
+    showMessage(message, msg)
+    setInputError(userInput)
+    setInputError(passInput)
+    userInput?.focus()
+  } catch (e) {
+    showMessage(message, MESSAGES.serverError)
+  } finally {
+    setLoading(btn, false)
   }
 }
+
+// Init on DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+  initPasswordToggle()
+  initClearMessageOnInput()
+})

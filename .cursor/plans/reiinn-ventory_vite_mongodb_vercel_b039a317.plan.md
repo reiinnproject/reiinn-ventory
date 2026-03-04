@@ -100,10 +100,10 @@ todos:
     status: completed
   - id: 4-3
     content: Create api/auth/login.js (POST, validate credentials, return JWT)
-    status: pending
+    status: completed
   - id: 4-4
     content: Create api/inventory.js (GET, POST) and api/inventory/[id].js (PUT, DELETE)
-    status: pending
+    status: completed
   - id: 4-5
     content: Create api/deliveries.js (GET, POST) and api/deliveries/[id].js (PUT, DELETE)
     status: pending
@@ -124,13 +124,13 @@ todos:
     status: pending
   - id: 4-11
     content: Seed users collection with admin and staff accounts
-    status: pending
+    status: completed
   - id: 5-1
     content: Update vercel.json with buildCommand, outputDirectory, rewrites for multi-page
     status: completed
   - id: 5-2
     content: Add MONGODB_URI and JWT_SECRET to Vercel env vars and .env.local
-    status: pending
+    status: completed
   - id: 5-3
     content: Push project to GitHub and connect Vercel to repository
     status: completed
@@ -142,7 +142,7 @@ todos:
     status: pending
   - id: 6-2
     content: Replace localStorage with API calls in inventory.js
-    status: pending
+    status: completed
   - id: 6-3
     content: Replace localStorage with API calls in scheduling.js
     status: pending
@@ -160,7 +160,7 @@ todos:
     status: pending
   - id: 6-8
     content: Replace hardcoded login with /api/auth/login and add auth guard
-    status: pending
+    status: completed
   - id: 6-9
     content: Test full flow locally (login, all views, CRUD operations)
     status: pending

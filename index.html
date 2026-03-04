@@ -3,19 +3,64 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>REIINN-ventory | Login</title>
+  <title>REIINN-ventory | Sign In</title>
   <link rel="stylesheet" href="/src/styles/variables.css">
   <link rel="stylesheet" href="/src/styles/layout.css">
   <link rel="stylesheet" href="/src/styles/components.css">
+  <link rel="stylesheet" href="/src/styles/login.css">
 </head>
 <body>
   <div id="login-screen">
-    <img src="/logo.png" class="login-logo" alt="Logo">
-    <h1>REIINN-ventory</h1>
-    <input type="text" id="userInput" placeholder="Username">
-    <input type="password" id="passInput" placeholder="Password">
-    <button class="btn-login" onclick="login()">Login</button>
-    <p id="err" style="display:none; color:var(--danger-red); font-size:12px; margin-top:10px;">Login Failed</p>
+    <img src="/logo.png" class="login-logo" alt="REIINN Logo">
+    <h1 class="login-title">REIINN-ventory</h1>
+    <p class="login-subtitle">Sign in to access the inventory portal</p>
+
+    <form id="loginForm" class="login-form" onsubmit="login(event)">
+      <div class="input-group">
+        <label for="userInput">Username</label>
+        <input
+          type="text"
+          id="userInput"
+          name="username"
+          placeholder="Enter your username"
+          autocomplete="username"
+          autofocus
+        >
+      </div>
+
+      <div class="input-group">
+        <label for="passInput">Password</label>
+        <div class="input-password-wrap">
+          <input
+            type="password"
+            id="passInput"
+            name="password"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+          >
+          <button type="button" class="btn-password-toggle" id="togglePassword" aria-label="Show password" title="Show password">
+            <svg class="icon-eye" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <svg class="icon-eye-off" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div id="message" class="login-message" role="alert" aria-live="polite"></div>
+
+      <button type="submit" class="btn-login" id="btnLogin">
+        <span class="btn-text">Sign In</span>
+        <span class="btn-loading" aria-hidden="true">
+          <span class="spinner"></span>
+          Signing in...
+        </span>
+      </button>
+    </form>
   </div>
   <script type="module" src="/src/main.js"></script>
 </body>

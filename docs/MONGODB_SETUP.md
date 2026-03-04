@@ -1,5 +1,13 @@
 # MongoDB Atlas Setup for REIINN-ventory
 
+## Quick Start
+
+1. Create a MongoDB Atlas cluster (see below)
+2. Copy `.env.example` to `.env.local` and set `MONGODB_URI` and `JWT_SECRET`
+3. Run `npm run seed` to create admin/staff users
+4. Run `npm run dev:full` (or `vercel dev`) for full-stack local dev with API
+5. Add `MONGODB_URI` and `JWT_SECRET` to Vercel Environment Variables for production
+
 ## 1. Create Account & Cluster
 
 1. Go to [mongodb.com/cloud/atlas](https://www.mongodb.com/cloud/atlas)
