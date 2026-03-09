@@ -94,23 +94,26 @@
   padding-right: 48px;
 }
 
+/* Hide browser's native password reveal (Edge, etc.) - we use our own */
+.input-password-wrap input::-ms-reveal,
+.input-password-wrap input::-ms-clear {
+  display: none !important;
+}
+
 .btn-password-toggle {
   position: absolute;
-  right: 10px;
+  right: 8px;
   top: 50%;
   transform: translateY(-50%);
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
   background: none;
   border: none;
   border-radius: 6px;
-  color: #64748b;
   cursor: pointer;
   transition: color 0.2s, background 0.2s;
-  overflow: hidden;
 }
 
 .btn-password-toggle:hover {
@@ -121,10 +124,6 @@
 .btn-password-toggle:focus {
   outline: none;
   color: var(--accent-blue);
-}
-
-.btn-password-toggle .icon-password {
-  display: block;
 }
 
 /* Message area */
