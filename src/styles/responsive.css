@@ -1,6 +1,11 @@
 /* Mobile-friendly responsive styles */
 
 @media (max-width: 768px) {
+  /* Login page: allow scroll so Sign In button is reachable on mobile */
+  body:has(#login-screen) {
+    overflow-y: auto;
+  }
+
   /* Login screen */
   #login-screen {
     padding: 32px 24px;
