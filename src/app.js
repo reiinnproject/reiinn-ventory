@@ -68,13 +68,12 @@ async function init() {
 }
 
 function updateUserRoleDisplay() {
-  const roleEl = document.getElementById('user-role')
-  if (!roleEl) return
+  const el = document.getElementById('user-role')
+  if (!el) return
   const user = getUser()
   const role = user?.role || 'staff'
-  const label = role === 'admin' ? 'Administrator' : 'Staff'
-  roleEl.textContent = label
-  roleEl.className = 'role-badge role-' + role
+  const username = user?.username
+  el.textContent = username ? `${username} (${role})` : `Logged in as: ${role}`
 }
 
 function updateClock() {
