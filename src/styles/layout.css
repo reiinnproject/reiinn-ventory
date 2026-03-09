@@ -77,10 +77,13 @@ body {
   position: relative;
   cursor: pointer;
   margin-right: 10px;
+  display: flex;
+  align-items: center;
+  color: white;
 }
 
 .notif-bell {
-  font-size: 20px;
+  flex-shrink: 0;
 }
 
 .notif-badge {
@@ -182,6 +185,17 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.menu-item-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.menu-icon {
+  flex-shrink: 0;
+  color: inherit;
 }
 
 .menu-arrow {
