@@ -72,8 +72,8 @@ function updateUserRoleDisplay() {
   if (!el) return
   const user = getUser()
   const role = user?.role || 'staff'
-  const username = user?.username
-  el.textContent = username ? `${username} (${role})` : `Logged in as: ${role}`
+  el.textContent = role === 'admin' ? 'Administrator' : 'Staff'
+  el.className = 'user-role role-' + role
 }
 
 function updateClock() {

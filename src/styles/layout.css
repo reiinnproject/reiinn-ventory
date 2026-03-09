@@ -226,11 +226,25 @@ body {
 }
 
 .user-role {
-  display: block;
-  font-size: 11px;
-  color: #64748b;
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 4px 10px;
+  border-radius: 6px;
   margin-bottom: 8px;
-  text-transform: capitalize;
+}
+
+.user-role.role-admin {
+  background: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+.user-role.role-staff {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.3);
 }
 
 .logout {
