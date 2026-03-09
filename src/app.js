@@ -48,6 +48,12 @@ async function init() {
   document.getElementById('main-app').style.display = 'flex'
   document.getElementById('live-clock').style.display = 'block'
 
+  // Ensure clock is direct child of body (fixes fixed positioning when scrolling)
+  const clock = document.getElementById('live-clock')
+  if (clock && clock.parentElement !== document.body) {
+    document.body.appendChild(clock)
+  }
+
   document.getElementById('descModal')?.addEventListener('click', (e) => {
     if (e.target.id === 'descModal') document.getElementById('descModal').style.display = 'none'
   })
