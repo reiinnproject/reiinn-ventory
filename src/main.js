@@ -42,7 +42,7 @@ function initPasswordToggle() {
   toggle.addEventListener('click', () => {
     const isVisible = input.type === 'text'
     input.type = isVisible ? 'password' : 'text'
-    toggle.setAttribute('aria-pressed', !isVisible)
+    toggle.setAttribute('aria-pressed', isVisible)
     toggle.setAttribute('aria-label', isVisible ? 'Show password' : 'Hide password')
     toggle.setAttribute('title', isVisible ? 'Show password' : 'Hide password')
   })

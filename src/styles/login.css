@@ -122,6 +122,14 @@
   color: var(--accent-blue);
 }
 
+.btn-password-toggle .icon-eye,
+.btn-password-toggle .icon-eye-off {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  pointer-events: none;
+}
+
 .btn-password-toggle .icon-eye-off {
   display: none;
 }
