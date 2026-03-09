@@ -123,30 +123,8 @@
   color: var(--accent-blue);
 }
 
-.btn-password-toggle .icon-eye,
-.btn-password-toggle .icon-eye-off {
-  position: absolute;
-  inset: 0;
-  margin: auto;
-  pointer-events: none;
-}
-
-/* Default: password hidden → show closed eye (eye-off) */
-.btn-password-toggle .icon-eye {
-  display: none;
-}
-
-.btn-password-toggle .icon-eye-off {
+.btn-password-toggle .icon-password {
   display: block;
-}
-
-/* aria-pressed=true: password visible → show open eye */
-.btn-password-toggle[aria-pressed="true"] .icon-eye {
-  display: block;
-}
-
-.btn-password-toggle[aria-pressed="true"] .icon-eye-off {
-  display: none;
 }
 
 /* Message area */
