@@ -16,6 +16,8 @@ body {
 #main-app {
   width: 100vw;
   height: 100vh;
+  min-height: 0;
+  overflow: hidden;
   background: var(--light-bg);
   display: flex;
   flex-direction: row;
@@ -35,7 +37,6 @@ body {
   text-align: right;
   z-index: 10000;
   pointer-events: none;
-  transform: translateZ(0);
 }
 
 #clock-time {
@@ -254,6 +255,7 @@ body {
 
 .content-section {
   flex-grow: 1;
+  min-height: 0;
   padding: 40px;
   overflow-y: auto;
   color: var(--primary-dark);
