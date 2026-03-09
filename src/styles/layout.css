@@ -1,7 +1,3 @@
-html {
-  overflow: hidden;
-}
-
 body {
   margin: 0;
   font-family: 'Inter', system-ui, sans-serif;
@@ -13,27 +9,18 @@ body {
   overflow: hidden;
 }
 
-body:has(#main-app) {
-  display: block;
-  overflow: hidden;
-}
-
 #main-app {
   width: 100vw;
   height: 100vh;
-  min-height: 0;
-  overflow: hidden;
   background: var(--light-bg);
   display: flex;
   flex-direction: row;
 }
 
 #live-clock {
-  position: fixed !important;
+  position: fixed;
   top: 20px;
   right: 20px;
-  left: auto;
-  bottom: auto;
   background: white;
   padding: 10px 15px;
   border-radius: 8px;
@@ -260,7 +247,6 @@ body:has(#main-app) {
 
 .content-section {
   flex-grow: 1;
-  min-height: 0;
   padding: 40px;
   overflow-y: auto;
   color: var(--primary-dark);
