@@ -2,8 +2,14 @@
 <div class="form-panel">
   <input type="text" id="gpReq" placeholder="Requester Name">
   <input type="text" id="gpLoc" placeholder="Deployment Location">
-  <input type="date" id="gpDate" title="Request Date">
-  <input type="date" id="gpReturn" title="Return Date">
+  <div class="form-field-labeled">
+    <label for="gpDate">Request Date</label>
+    <input type="date" id="gpDate">
+  </div>
+  <div class="form-field-labeled">
+    <label for="gpReturn">Return Date</label>
+    <input type="date" id="gpReturn">
+  </div>
 </div>
 <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
   <div class="card" style="flex: 1.2; min-width: 280px;">

@@ -20,6 +20,24 @@
   flex: 1;
 }
 
+.form-field-labeled {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 140px;
+  flex: 1;
+}
+
+.form-field-labeled label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.form-field-labeled input {
+  flex: none;
+}
+
 .admin-only {
   display: none;
 }
