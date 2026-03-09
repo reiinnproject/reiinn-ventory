@@ -1,0 +1,142 @@
+/* Mobile-friendly responsive styles */
+
+@media (max-width: 768px) {
+  /* Login screen */
+  #login-screen {
+    padding: 32px 24px;
+    width: 100%;
+    max-width: 100%;
+    margin: 16px;
+  }
+  /* Mobile header with hamburger */
+  .mobile-header {
+    display: flex !important;
+  }
+
+  /* Sidebar: fixed overlay, hidden by default */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    max-width: 85vw;
+    z-index: 1002;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* Overlay when sidebar open */
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1001;
+    transition: opacity 0.3s;
+  }
+
+  .sidebar-overlay.visible {
+    display: block;
+  }
+
+  /* Content area: top padding for mobile header, horizontal scroll for tables */
+  .content-section {
+    padding: 16px;
+    padding-top: 72px;
+    overflow-x: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Stats grid: single column */
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .content-section table {
+    min-width: 500px;
+  }
+
+  /* Form panels: stack inputs */
+  .form-panel input,
+  .form-field-labeled {
+    min-width: 0;
+  }
+
+  /* Cards: full width on mobile */
+  .card {
+    padding: 16px;
+    min-width: 0 !important;
+  }
+
+  /* Clock: smaller on mobile */
+  #live-clock {
+    top: 12px;
+    right: 12px;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  #clock-time {
+    font-size: 14px;
+  }
+
+  #clock-date {
+    font-size: 10px;
+  }
+
+  /* Modal: full width on small screens */
+  .modal-box {
+    width: 95vw;
+    max-width: 95vw;
+    margin: 16px;
+    padding: 20px;
+  }
+
+  /* Search bar: full width */
+  .search-bar {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Calendar: smaller day cells */
+  .calendar-day {
+    min-height: 60px;
+    font-size: 10px;
+  }
+
+  .cal-label {
+    font-size: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .content-section {
+    padding: 12px;
+    padding-top: 68px;
+  }
+
+  .mobile-header {
+    height: 52px;
+    padding: 0 12px;
+  }
+
+  .mobile-header span {
+    font-size: 14px;
+  }
+
+  #live-clock {
+    display: none;
+  }
+
+  .form-panel {
+    padding: 16px;
+  }
+}

@@ -60,11 +60,48 @@ async function init() {
 
   document.querySelector('.logout')?.addEventListener('click', logout)
 
+  initMobileSidebar()
   updateUserRoleDisplay()
   await initNotifications()
   initRouter()
   initNav()
   toggleAdminElements()
+}
+
+function initMobileSidebar() {
+  const btn = document.getElementById('btnHamburger')
+  const sidebar = document.getElementById('sidebar')
+  const overlay = document.getElementById('sidebarOverlay')
+  const mobileHeader = document.getElementById('mobileHeader')
+
+  function openSidebar() {
+    sidebar?.classList.add('open')
+    overlay?.classList.add('visible')
+    document.body.style.overflow = 'hidden'
+  }
+
+  function closeSidebar() {
+    sidebar?.classList.remove('open')
+    overlay?.classList.remove('visible')
+    document.body.style.overflow = ''
+  }
+
+  btn?.addEventListener('click', () => {
+    if (sidebar?.classList.contains('open')) closeSidebar()
+    else openSidebar()
+  })
+
+  overlay?.addEventListener('click', closeSidebar)
+
+  document.querySelectorAll('.menu-item[data-route], .sub-item[data-route]').forEach((el) => {
+    el.addEventListener('click', () => {
+      if (window.innerWidth <= 768) closeSidebar()
+    })
+  })
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) closeSidebar()
+  })
 }
 
 function updateUserRoleDisplay() {

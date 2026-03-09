@@ -9,10 +9,18 @@
   <link rel="stylesheet" href="/src/styles/variables.css">
   <link rel="stylesheet" href="/src/styles/layout.css">
   <link rel="stylesheet" href="/src/styles/components.css">
+  <link rel="stylesheet" href="/src/styles/responsive.css">
 </head>
 <body>
   <div id="main-app">
-    <div class="sidebar">
+    <div class="mobile-header" id="mobileHeader" style="display: none;">
+      <button type="button" class="btn-hamburger" id="btnHamburger" aria-label="Open menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span>REIINN-ventory</span>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div style="display: flex; align-items: center; gap: 10px;">
           <div class="notif-wrapper" id="notifWrapper">
