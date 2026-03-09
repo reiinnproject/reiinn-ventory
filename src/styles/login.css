@@ -110,6 +110,7 @@
   color: #64748b;
   cursor: pointer;
   transition: color 0.2s, background 0.2s;
+  overflow: hidden;
 }
 
 .btn-password-toggle:hover {
@@ -130,16 +131,22 @@
   pointer-events: none;
 }
 
-.btn-password-toggle .icon-eye-off {
+/* Default: password hidden → show closed eye (eye-off) */
+.btn-password-toggle .icon-eye {
   display: none;
 }
 
+.btn-password-toggle .icon-eye-off {
+  display: block;
+}
+
+/* aria-pressed=true: password visible → show open eye */
 .btn-password-toggle[aria-pressed="true"] .icon-eye {
-  display: none;
+  display: block;
 }
 
 .btn-password-toggle[aria-pressed="true"] .icon-eye-off {
-  display: block;
+  display: none;
 }
 
 /* Message area */
