@@ -26,10 +26,33 @@ body:has(#main-app) {
   background: var(--sidebar-bg);
   color: white;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   padding: 0 16px;
   z-index: 1001;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.app-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-header .user-role {
+  font-size: 10px;
+  padding: 4px 10px;
+}
+
+.app-header .logout {
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.app-header .logout:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .btn-hamburger {
