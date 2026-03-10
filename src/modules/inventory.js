@@ -7,6 +7,9 @@ import { getUser } from '../auth.js'
 import { api } from '../api.js'
 
 const STORAGE_KEY = 'rei_inv'
+const PAGE_SIZE = 10
+let currentPage = 1
+let totalPages = 1
 
 async function loadInventory() {
   try {
@@ -45,6 +48,11 @@ async function renderList() {
       (i.stock || '').toLowerCase().includes(query)
   )
 
+  totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  if (currentPage > totalPages) currentPage = totalPages
+  const start = (currentPage - 1) * PAGE_SIZE
+  const pageItems = filtered.slice(start, start + PAGE_SIZE)
+
   const adminClass = isAdmin() ? '' : 'admin-only'
   function escapeHtml(s) {
     const div = document.createElement('div')
@@ -55,7 +63,7 @@ async function renderList() {
   const pencilIcon = '<svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>'
   const trashIcon = '<svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>'
 
-  invBody.innerHTML = filtered
+  invBody.innerHTML = pageItems
     .map((item) => {
       const id = item._id || inventory.indexOf(item)
       const descContent = escapeHtml(item.desc || '(No description)')
@@ -136,6 +144,17 @@ async function renderList() {
       }
     })
   })
+
+  const paginationEl = document.getElementById('invPagination')
+  const prevBtn = document.getElementById('invPrev')
+  const nextBtn = document.getElementById('invNext')
+  const pageInfoEl = document.getElementById('invPageInfo')
+  if (paginationEl) {
+    paginationEl.style.display = filtered.length > PAGE_SIZE ? 'flex' : 'none'
+    if (pageInfoEl) pageInfoEl.textContent = `Page ${currentPage} of ${totalPages}`
+    if (prevBtn) prevBtn.disabled = currentPage <= 1
+    if (nextBtn) nextBtn.disabled = currentPage >= totalPages
+  }
 }
 
 async function addItem() {
@@ -178,9 +197,27 @@ function toggleAdminElements() {
 }
 
 function bindEvents() {
-  document.getElementById('invSearch')?.addEventListener('input', renderList)
-  document.getElementById('invSearch')?.addEventListener('keyup', renderList)
+  document.getElementById('invSearch')?.addEventListener('input', () => {
+    currentPage = 1
+    renderList()
+  })
+  document.getElementById('invSearch')?.addEventListener('keyup', () => {
+    currentPage = 1
+    renderList()
+  })
   document.getElementById('invRegisterBtn')?.addEventListener('click', addItem)
+  document.getElementById('invPrev')?.addEventListener('click', () => {
+    if (currentPage > 1) {
+      currentPage--
+      renderList()
+    }
+  })
+  document.getElementById('invNext')?.addEventListener('click', () => {
+    if (currentPage < totalPages) {
+      currentPage++
+      renderList()
+    }
+  })
 }
 
 export function init() {

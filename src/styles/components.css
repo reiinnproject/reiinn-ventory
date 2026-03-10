@@ -81,6 +81,40 @@ table {
   border: 1px solid var(--border-color);
 }
 
+.inv-pagination {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+  padding: 12px 0;
+}
+
+.btn-pagination {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: white;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.btn-pagination:hover:not(:disabled) {
+  background: #f1f5f9;
+  color: var(--primary-dark);
+}
+
+.btn-pagination:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#invPageInfo {
+  font-size: 12px;
+  color: #64748b;
+}
+
 .inv-desc-cell {
   max-width: 320px;
   white-space: pre-wrap;
