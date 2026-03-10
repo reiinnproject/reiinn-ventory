@@ -13,11 +13,6 @@
     max-width: 100%;
     margin: 16px;
   }
-  /* Mobile header with hamburger */
-  .mobile-header {
-    display: flex !important;
-  }
-
   /* Sidebar: fixed overlay, hidden by default */
   .sidebar {
     position: fixed;
@@ -82,7 +77,7 @@
   }
 
   /* Clock: smaller on mobile */
-  #live-clock {
+  .live-clock-fixed {
     top: 12px;
     right: 12px;
     padding: 8px 12px;
@@ -127,16 +122,16 @@
     padding-top: 68px;
   }
 
-  .mobile-header {
+  .app-header {
     height: 52px;
     padding: 0 12px;
   }
 
-  .mobile-header span {
+  .app-header-title {
     font-size: 14px;
   }
 
-  #live-clock {
+  .live-clock-fixed {
     display: none;
   }
 

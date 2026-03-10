@@ -60,7 +60,7 @@ async function init() {
 
   document.querySelector('.logout')?.addEventListener('click', logout)
 
-  initMobileSidebar()
+  initSidebar()
   updateUserRoleDisplay()
   await initNotifications()
   initRouter()
@@ -68,38 +68,43 @@ async function init() {
   toggleAdminElements()
 }
 
-function initMobileSidebar() {
+function initSidebar() {
   const btn = document.getElementById('btnHamburger')
   const sidebar = document.getElementById('sidebar')
   const overlay = document.getElementById('sidebarOverlay')
 
-  function openSidebar() {
+  function openOverlay() {
     sidebar?.classList.add('open')
     overlay?.classList.add('visible')
     document.body.style.overflow = 'hidden'
   }
 
-  function closeSidebar() {
+  function closeOverlay() {
     sidebar?.classList.remove('open')
     overlay?.classList.remove('visible')
     document.body.style.overflow = ''
   }
 
-  btn?.addEventListener('click', () => {
-    if (sidebar?.classList.contains('open')) closeSidebar()
-    else openSidebar()
-  })
+  function toggleSidebar() {
+    if (window.innerWidth <= 768) {
+      if (sidebar?.classList.contains('open')) closeOverlay()
+      else openOverlay()
+    } else {
+      document.body.classList.toggle('sidebar-collapsed')
+    }
+  }
 
-  overlay?.addEventListener('click', closeSidebar)
+  btn?.addEventListener('click', toggleSidebar)
+  overlay?.addEventListener('click', closeOverlay)
 
   document.querySelectorAll('.menu-item[data-route], .sub-item[data-route]').forEach((el) => {
     el.addEventListener('click', () => {
-      if (window.innerWidth <= 768) closeSidebar()
+      if (window.innerWidth <= 768) closeOverlay()
     })
   })
 
   window.addEventListener('resize', () => {
-    if (window.innerWidth > 768) closeSidebar()
+    if (window.innerWidth > 768) closeOverlay()
   })
 }
 

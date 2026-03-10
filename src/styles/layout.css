@@ -9,15 +9,15 @@ body {
   overflow: hidden;
 }
 
-/* App page: allow scroll when content overflows */
+/* App page: scroll in content area only, not body */
 body:has(#main-app) {
-  overflow-y: auto;
+  overflow: hidden;
   align-items: flex-start;
 }
 
-/* Mobile header - visible only on small screens via responsive.css */
-.mobile-header {
-  display: none;
+/* App header - toggle button, always visible */
+.app-header {
+  display: flex;
   position: fixed;
   top: 0;
   left: 0;
@@ -28,11 +28,11 @@ body:has(#main-app) {
   align-items: center;
   gap: 12px;
   padding: 0 16px;
-  z-index: 1000;
+  z-index: 1001;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.mobile-header span {
+.app-header-title {
   font-size: 16px;
   font-weight: 600;
   letter-spacing: 0.5px;
@@ -60,13 +60,16 @@ body:has(#main-app) {
 
 #main-app {
   width: 100vw;
-  min-height: 100vh;
+  height: 100vh;
+  padding-top: 56px;
   background: var(--light-bg);
   display: flex;
   flex-direction: row;
+  overflow: hidden;
 }
 
-#live-clock {
+/* Clock - fixed to viewport, does not scroll */
+.live-clock-fixed {
   position: fixed;
   top: 20px;
   right: 20px;
@@ -95,12 +98,32 @@ body:has(#main-app) {
 
 .sidebar {
   width: 280px;
+  min-width: 280px;
   background: var(--sidebar-bg);
   color: white;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  transition: width 0.3s ease, min-width 0.3s ease;
+}
+
+/* Desktop: sidebar collapse when toggled */
+@media (min-width: 769px) {
+  body.sidebar-collapsed .sidebar {
+    width: 0 !important;
+    min-width: 0 !important;
+    overflow: hidden;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+  }
+
+  body.sidebar-collapsed .sidebar > * {
+    opacity: 0;
+    pointer-events: none;
+    white-space: nowrap;
+  }
 }
 
 .sidebar-header {
