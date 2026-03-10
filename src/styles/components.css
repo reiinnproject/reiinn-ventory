@@ -80,6 +80,14 @@ table {
   box-shadow: var(--shadow);
 }
 
+.inv-desc-cell {
+  max-width: 320px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  line-height: 1.5;
+  vertical-align: top;
+}
+
 th {
   background: #f8fafc;
   padding: 12px;

@@ -58,7 +58,7 @@ async function renderList() {
       return `<tr>
         <td>${escapeHtml(item.stock || '')}</td>
         <td><b>${escapeHtml(item.name || '')}</b></td>
-        <td style="color:var(--accent-blue); cursor:pointer; text-decoration:underline" data-item-id="${id}">View Desc</td>
+        <td class="inv-desc-cell">${escapeHtml(item.desc || '(No description)')}</td>
         <td>${escapeHtml(item.loc || '')}</td>
         <td>${escapeHtml(String(item.bal ?? ''))}</td>
         <td>${escapeHtml(item.col || '')}</td>
@@ -67,18 +67,6 @@ async function renderList() {
       </tr>`
     })
     .join('')
-
-  invBody.querySelectorAll('[data-item-id]').forEach((el) => {
-    el.addEventListener('click', () => {
-      const id = el.dataset.itemId
-      const item = inventory.find(
-        (i) => String(i._id || '') === id || String(inventory.indexOf(i)) === id
-      )
-      const raw = item?.desc?.trim() || '(No description)'
-      const desc = escapeHtml(raw)
-      window.openModal?.('Item Description', desc)
-    })
-  })
 
   invBody.querySelectorAll('.btn-del[data-id]').forEach((el) => {
     el.addEventListener('click', async () => {
