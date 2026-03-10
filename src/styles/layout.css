@@ -37,11 +37,6 @@ body:has(#main-app) {
   gap: 12px;
 }
 
-.app-header .user-role {
-  font-size: 10px;
-  padding: 4px 10px;
-}
-
 .app-header .logout {
   font-size: 13px;
   padding: 6px 12px;
@@ -149,7 +144,24 @@ body:has(#main-app) {
   border-bottom: 1px solid #334155;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+}
+
+.sidebar-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebar-title {
+  font-size: 16px;
+  letter-spacing: 0.5px;
+}
+
+.sidebar-header .user-role {
+  font-size: 10px;
+  padding: 4px 10px;
+  align-self: flex-start;
 }
 
 .sidebar-logo {
