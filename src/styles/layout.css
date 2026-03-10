@@ -26,14 +26,12 @@ body:has(#main-app) {
   background: var(--sidebar-bg);
   color: white;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
   padding: 0 16px;
   z-index: 1001;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.app-header-right {
+.app-header-left {
   display: flex;
   align-items: center;
   gap: 12px;
