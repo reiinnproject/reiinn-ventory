@@ -145,19 +145,20 @@ async function renderList() {
     })
   })
 
+  const paginationWrap = document.querySelector('.inv-pagination-wrap')
   const paginationEl = document.getElementById('invPagination')
-  const prevBtn = document.getElementById('invPrev')
-  const nextBtn = document.getElementById('invNext')
-  const pageSelectEl = document.getElementById('invPageSelect')
-  if (paginationEl) {
-    paginationEl.style.display = filtered.length > PAGE_SIZE ? 'flex' : 'none'
-    if (pageSelectEl) {
-      pageSelectEl.innerHTML = Array.from({ length: totalPages }, (_, i) => i + 1)
-        .map((p) => `<option value="${p}"${p === currentPage ? ' selected' : ''}>${p}</option>`)
+  const firstBtn = document.getElementById('invFirst')
+  const lastBtn = document.getElementById('invLast')
+  const pgNumbersEl = document.getElementById('invPgNumbers')
+  if (paginationWrap && paginationEl) {
+    paginationWrap.style.display = filtered.length > PAGE_SIZE ? 'flex' : 'none'
+    if (pgNumbersEl) {
+      pgNumbersEl.innerHTML = Array.from({ length: totalPages }, (_, i) => i + 1)
+        .map((p) => `<button type="button" class="inv-pg-num${p === currentPage ? ' active' : ''}" data-page="${p}">${p}</button>`)
         .join('')
     }
-    if (prevBtn) prevBtn.disabled = currentPage <= 1
-    if (nextBtn) nextBtn.disabled = currentPage >= totalPages
+    if (firstBtn) firstBtn.disabled = currentPage <= 1
+    if (lastBtn) lastBtn.disabled = currentPage >= totalPages
   }
 }
 
@@ -210,23 +211,26 @@ function bindEvents() {
     renderList()
   })
   document.getElementById('invRegisterBtn')?.addEventListener('click', addItem)
-  document.getElementById('invPrev')?.addEventListener('click', () => {
+  document.getElementById('invFirst')?.addEventListener('click', () => {
     if (currentPage > 1) {
-      currentPage--
+      currentPage = 1
       renderList()
     }
   })
-  document.getElementById('invNext')?.addEventListener('click', () => {
+  document.getElementById('invLast')?.addEventListener('click', () => {
     if (currentPage < totalPages) {
-      currentPage++
+      currentPage = totalPages
       renderList()
     }
   })
-  document.getElementById('invPageSelect')?.addEventListener('change', (e) => {
-    const page = parseInt(e.target.value, 10)
-    if (!isNaN(page) && page >= 1 && page <= totalPages) {
-      currentPage = page
-      renderList()
+  document.getElementById('invPgNumbers')?.addEventListener('click', (e) => {
+    const btn = e.target.closest('.inv-pg-num')
+    if (btn) {
+      const page = parseInt(btn.dataset.page, 10)
+      if (!isNaN(page) && page >= 1 && page <= totalPages) {
+        currentPage = page
+        renderList()
+      }
     }
   })
 }

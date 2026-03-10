@@ -15,8 +15,10 @@
   </thead>
   <tbody id="invBody"></tbody>
 </table>
-<div class="inv-pagination" id="invPagination">
-  <button type="button" class="btn-pagination" id="invPrev" disabled>← Previous</button>
-  <select id="invPageSelect" class="inv-page-select" aria-label="Page selection"></select>
-  <button type="button" class="btn-pagination" id="invNext" disabled>Next →</button>
+<div class="inv-pagination-wrap">
+  <div class="inv-pagination" id="invPagination">
+    <button type="button" class="inv-pg-btn inv-pg-first" id="invFirst" title="First page">«</button>
+    <div class="inv-pg-numbers" id="invPgNumbers"></div>
+    <button type="button" class="inv-pg-btn inv-pg-last" id="invLast" title="Last page">»</button>
+  </div>
 </div>
