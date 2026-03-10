@@ -14,14 +14,6 @@
     margin: 16px;
   }
 
-  .login-logos {
-    padding: 12px 20px;
-    gap: 16px;
-  }
-
-  .login-logo-item {
-    height: 44px;
-  }
   /* Sidebar: fixed overlay, hidden by default */
   .sidebar {
     position: fixed;
