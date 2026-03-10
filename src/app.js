@@ -46,7 +46,6 @@ async function init() {
 
   document.getElementById('login-screen')?.remove()
   document.getElementById('main-app').style.display = 'flex'
-  document.getElementById('live-clock').style.display = 'block'
 
   document.getElementById('descModal')?.addEventListener('click', (e) => {
     if (e.target.id === 'descModal') document.getElementById('descModal').style.display = 'none'
@@ -60,7 +59,7 @@ async function init() {
 
   document.querySelector('.logout')?.addEventListener('click', logout)
 
-  initMobileSidebar()
+  initSidebar()
   updateUserRoleDisplay()
   await initNotifications()
   initRouter()
@@ -68,39 +67,43 @@ async function init() {
   toggleAdminElements()
 }
 
-function initMobileSidebar() {
+function initSidebar() {
   const btn = document.getElementById('btnHamburger')
   const sidebar = document.getElementById('sidebar')
   const overlay = document.getElementById('sidebarOverlay')
-  const mobileHeader = document.getElementById('mobileHeader')
 
-  function openSidebar() {
+  function openOverlay() {
     sidebar?.classList.add('open')
     overlay?.classList.add('visible')
     document.body.style.overflow = 'hidden'
   }
 
-  function closeSidebar() {
+  function closeOverlay() {
     sidebar?.classList.remove('open')
     overlay?.classList.remove('visible')
     document.body.style.overflow = ''
   }
 
-  btn?.addEventListener('click', () => {
-    if (sidebar?.classList.contains('open')) closeSidebar()
-    else openSidebar()
-  })
+  function toggleSidebar() {
+    if (window.innerWidth <= 768) {
+      if (sidebar?.classList.contains('open')) closeOverlay()
+      else openOverlay()
+    } else {
+      document.body.classList.toggle('sidebar-collapsed')
+    }
+  }
 
-  overlay?.addEventListener('click', closeSidebar)
+  btn?.addEventListener('click', toggleSidebar)
+  overlay?.addEventListener('click', closeOverlay)
 
   document.querySelectorAll('.menu-item[data-route], .sub-item[data-route]').forEach((el) => {
     el.addEventListener('click', () => {
-      if (window.innerWidth <= 768) closeSidebar()
+      if (window.innerWidth <= 768) closeOverlay()
     })
   })
 
   window.addEventListener('resize', () => {
-    if (window.innerWidth > 768) closeSidebar()
+    if (window.innerWidth > 768) closeOverlay()
   })
 }
 
@@ -117,10 +120,11 @@ function updateClock() {
   const now = new Date()
   const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })
   const date = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: '2-digit' })
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
   const clockTime = document.getElementById('clock-time')
   const clockDate = document.getElementById('clock-date')
   if (clockTime) clockTime.textContent = time
-  if (clockDate) clockDate.textContent = date
+  if (clockDate) clockDate.textContent = `${date} ${tz}`
 }
 
 function initRouter() {

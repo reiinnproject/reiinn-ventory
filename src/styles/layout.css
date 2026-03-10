@@ -9,35 +9,28 @@ body {
   overflow: hidden;
 }
 
-/* Mobile header - visible only on small screens via responsive.css */
-.mobile-header {
-  display: none;
+/* App header - dark blue bar with hamburger and clock */
+.app-header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: 56px;
   background: var(--sidebar-bg);
-  color: white;
+  display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 0 16px;
+  justify-content: space-between;
+  padding: 0 20px;
   z-index: 1000;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.mobile-header span {
-  font-size: 16px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-}
-
 .btn-hamburger {
-  background: none;
+  background: #f97316;
   border: none;
   color: white;
   cursor: pointer;
-  padding: 8px;
+  padding: 10px 14px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -45,56 +38,67 @@ body {
 }
 
 .btn-hamburger:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: #ea580c;
 }
 
 .btn-hamburger:focus {
   outline: none;
 }
 
+.live-clock {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+
+#clock-date {
+  color: #94a3b8;
+}
+
+#clock-time {
+  color: #f59e0b;
+  font-weight: 700;
+  font-size: 15px;
+}
+
 #main-app {
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
+  padding-top: 56px;
   background: var(--light-bg);
   display: flex;
   flex-direction: row;
 }
 
-#live-clock {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: white;
-  padding: 10px 15px;
-  border-radius: 8px;
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border-color);
-  text-align: right;
-  z-index: 10000;
-  pointer-events: none;
-}
+/* Sidebar collapse - when hidden, content expands (desktop only) */
+@media (min-width: 769px) {
+  body.sidebar-collapsed .sidebar {
+    width: 0 !important;
+    min-width: 0 !important;
+    overflow: hidden;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+  }
 
-#clock-time {
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--primary-dark);
-  display: block;
-}
-
-#clock-date {
-  font-size: 11px;
-  color: #64748b;
-  font-weight: 500;
+  body.sidebar-collapsed .sidebar > * {
+    opacity: 0;
+    pointer-events: none;
+    white-space: nowrap;
+  }
 }
 
 .sidebar {
   width: 280px;
+  min-width: 280px;
   background: var(--sidebar-bg);
   color: white;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  transition: width 0.3s ease, min-width 0.3s ease;
 }
 
 .sidebar-header {

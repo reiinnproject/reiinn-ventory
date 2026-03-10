@@ -12,13 +12,16 @@
   <link rel="stylesheet" href="/src/styles/responsive.css">
 </head>
 <body>
-  <div id="main-app">
-    <div class="mobile-header" id="mobileHeader" style="display: none;">
-      <button type="button" class="btn-hamburger" id="btnHamburger" aria-label="Open menu">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-      </button>
-      <span>REIINN-ventory</span>
+  <header class="app-header">
+    <button type="button" class="btn-hamburger" id="btnHamburger" aria-label="Toggle menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div id="live-clock" class="live-clock">
+      <span id="clock-date">Monday, January 01, 2026</span>
+      <span id="clock-time">00:00:00 AM</span>
     </div>
+  </header>
+  <div id="main-app">
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <div class="sidebar" id="sidebar">
       <div class="sidebar-header">
@@ -65,10 +68,6 @@
       <div id="fullDescText" style="font-size: 14px; line-height: 1.5; color: #334155;"></div>
       <button id="modalClose" class="btn-action" style="background:var(--primary-dark); width:100%; margin-top:20px;">Close</button>
     </div>
-  </div>
-  <div id="live-clock">
-    <span id="clock-time">00:00:00 AM</span>
-    <span id="clock-date">Monday, January 01, 2026</span>
   </div>
   <script type="module" src="/src/app.js"></script>
 </body>

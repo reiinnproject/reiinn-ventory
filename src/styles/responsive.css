@@ -13,11 +13,6 @@
     max-width: 100%;
     margin: 16px;
   }
-  /* Mobile header with hamburger */
-  .mobile-header {
-    display: flex !important;
-  }
-
   /* Sidebar: fixed overlay, hidden by default */
   .sidebar {
     position: fixed;
@@ -50,10 +45,9 @@
     display: block;
   }
 
-  /* Content area: top padding for mobile header, horizontal scroll for tables */
+  /* Content area: horizontal scroll for tables */
   .content-section {
     padding: 16px;
-    padding-top: 72px;
     overflow-x: auto;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
@@ -82,15 +76,12 @@
   }
 
   /* Clock: smaller on mobile */
-  #live-clock {
-    top: 12px;
-    right: 12px;
-    padding: 8px 12px;
-    font-size: 12px;
+  .live-clock {
+    font-size: 11px;
   }
 
   #clock-time {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   #clock-date {
@@ -125,19 +116,13 @@
 @media (max-width: 480px) {
   .content-section {
     padding: 12px;
-    padding-top: 68px;
   }
 
-  .mobile-header {
-    height: 52px;
+  .app-header {
     padding: 0 12px;
   }
 
-  .mobile-header span {
-    font-size: 14px;
-  }
-
-  #live-clock {
+  .live-clock {
     display: none;
   }
 
