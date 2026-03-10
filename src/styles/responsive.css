@@ -13,6 +13,16 @@
     max-width: 100%;
     margin: 16px;
   }
+
+  .login-logos {
+    bottom: 16px;
+    right: 16px;
+    gap: 12px;
+  }
+
+  .login-logo-item {
+    height: 28px;
+  }
   /* Sidebar: fixed overlay, hidden by default */
   .sidebar {
     position: fixed;

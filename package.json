@@ -1,7 +1,9 @@
 {
   "name": "reiinn-ventory",
   "version": "1.0.0",
-  "engines": { "node": ">=18" },
+  "engines": {
+    "node": ">=18"
+  },
   "description": "REIINN-ventory portal - local server",
   "type": "module",
   "scripts": {
@@ -19,6 +21,7 @@
     "mongodb": "^6.0.0"
   },
   "devDependencies": {
+    "sharp": "^0.34.5",
     "vite": "^6.0.0"
   }
 }

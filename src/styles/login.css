@@ -1,3 +1,25 @@
+/* Login logos - bottom right */
+.login-logos {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  z-index: 10;
+}
+
+.login-logo-item {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+  opacity: 0.9;
+}
+
+.login-logo-item:hover {
+  opacity: 1;
+}
+
 /* Login screen - enhanced UX */
 #login-screen {
   background: white;
