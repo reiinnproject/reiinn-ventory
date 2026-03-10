@@ -20,7 +20,7 @@ window.openModal = function (title, content) {
   const contentEl = document.getElementById('fullDescText')
   if (modal && titleEl && contentEl) {
     titleEl.textContent = title
-    contentEl.innerHTML = content
+    contentEl.innerHTML = content || '(No description)'
     modal.style.display = 'flex'
   }
 }
