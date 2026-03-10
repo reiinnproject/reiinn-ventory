@@ -46,29 +46,68 @@ async function renderList() {
   )
 
   const adminClass = isAdmin() ? '' : 'admin-only'
+  const editableClass = isAdmin() ? 'editable-cell' : ''
   function escapeHtml(s) {
     const div = document.createElement('div')
     div.textContent = s
     return div.innerHTML
   }
 
+  const pencilIcon = '<svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>'
+  const trashIcon = '<svg class="btn-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>'
+
   invBody.innerHTML = filtered
     .map((item) => {
       const id = item._id || inventory.indexOf(item)
+      const descContent = escapeHtml(item.desc || '(No description)')
       return `<tr>
         <td>${escapeHtml(item.stock || '')}</td>
         <td><b>${escapeHtml(item.name || '')}</b></td>
-        <td class="inv-desc-cell">${escapeHtml(item.desc || '(No description)')}</td>
+        <td class="inv-desc-cell ${editableClass}" contenteditable="${isAdmin()}" data-id="${String(id)}">${descContent}</td>
         <td>${escapeHtml(item.loc || '')}</td>
         <td>${escapeHtml(String(item.bal ?? ''))}</td>
         <td>${escapeHtml(item.col || '')}</td>
         <td>${escapeHtml(item.cat || '')}</td>
-        <td class="${adminClass}"><button class="btn-del" data-id="${id}">X</button></td>
+        <td class="${adminClass} inv-actions">
+          <button type="button" class="btn-icon btn-edit" data-id="${String(id)}" title="Edit description">${pencilIcon}</button>
+          <button type="button" class="btn-icon btn-del" data-id="${String(id)}" title="Delete">${trashIcon}</button>
+        </td>
       </tr>`
     })
     .join('')
 
-  invBody.querySelectorAll('.btn-del[data-id]').forEach((el) => {
+  invBody.querySelectorAll('.inv-desc-cell.editable-cell').forEach((el) => {
+    el.addEventListener('blur', async () => {
+      const id = el.dataset.id
+      const newDesc = el.textContent?.trim() ?? ''
+      const item = inventory.find(
+        (i) => String(i._id || '') === id || String(inventory.indexOf(i)) === id
+      )
+      if (!item || (item.desc || '') === newDesc) return
+      if (item._id) {
+        try {
+          await api.put(`/api/inventory/${String(item._id)}`, { desc: newDesc })
+          item.desc = newDesc
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(inventory))
+        } catch {
+          el.textContent = item.desc || '(No description)'
+        }
+      } else {
+        item.desc = newDesc
+        saveLocalInventory(inventory)
+      }
+    })
+  })
+
+  invBody.querySelectorAll('.btn-icon.btn-edit').forEach((el) => {
+    el.addEventListener('click', () => {
+      const row = el.closest('tr')
+      const descCell = row?.querySelector('.inv-desc-cell')
+      if (descCell) descCell.focus()
+    })
+  })
+
+  invBody.querySelectorAll('.btn-icon.btn-del').forEach((el) => {
     el.addEventListener('click', async () => {
       const id = el.dataset.id
       if (!confirm('Delete this item?')) return
@@ -76,11 +115,11 @@ async function renderList() {
         await api.delete(`/api/inventory?id=${id}`)
         renderList()
       } catch {
-        const inventory = getLocalInventory()
+        const inv = getLocalInventory()
         const idx = parseInt(id, 10)
         if (!isNaN(idx) && idx >= 0) {
-          inventory.splice(idx, 1)
-          saveLocalInventory(inventory)
+          inv.splice(idx, 1)
+          saveLocalInventory(inv)
           renderList()
         }
       }
