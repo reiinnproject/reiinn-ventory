@@ -87,10 +87,8 @@ table {
   word-wrap: break-word;
   line-height: 1.5;
   vertical-align: top;
-}
-
-.inv-desc-cell.editable-cell {
-  cursor: text;
+  padding: 12px 18px;
+  border: 1px solid var(--border-color);
 }
 
 th {
@@ -173,14 +171,14 @@ td:last-child {
   min-width: 80px;
 }
 
-.editable-cell {
-  border: 1px dashed transparent;
-  padding: 5px;
+.inv-desc-cell.editable-cell {
+  cursor: text;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   transition: 0.2s;
 }
 
-.editable-cell:focus {
+.inv-desc-cell.editable-cell:focus {
   background: #f1f5f9;
   border-color: var(--accent-blue);
   outline: none;

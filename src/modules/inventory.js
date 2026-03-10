@@ -46,7 +46,6 @@ async function renderList() {
   )
 
   const adminClass = isAdmin() ? '' : 'admin-only'
-  const editableClass = isAdmin() ? 'editable-cell' : ''
   function escapeHtml(s) {
     const div = document.createElement('div')
     div.textContent = s
@@ -63,7 +62,7 @@ async function renderList() {
       return `<tr>
         <td>${escapeHtml(item.stock || '')}</td>
         <td><b>${escapeHtml(item.name || '')}</b></td>
-        <td class="inv-desc-cell ${editableClass}" contenteditable="${isAdmin()}" data-id="${String(id)}">${descContent}</td>
+        <td class="inv-desc-cell" contenteditable="false" data-id="${String(id)}">${descContent}</td>
         <td>${escapeHtml(item.loc || '')}</td>
         <td>${escapeHtml(String(item.bal ?? ''))}</td>
         <td>${escapeHtml(item.col || '')}</td>
@@ -76,34 +75,46 @@ async function renderList() {
     })
     .join('')
 
-  invBody.querySelectorAll('.inv-desc-cell.editable-cell').forEach((el) => {
-    el.addEventListener('blur', async () => {
-      const id = el.dataset.id
-      const newDesc = el.textContent?.trim() ?? ''
-      const item = inventory.find(
-        (i) => String(i._id || '') === id || String(inventory.indexOf(i)) === id
-      )
-      if (!item || (item.desc || '') === newDesc) return
-      if (item._id) {
-        try {
-          await api.put(`/api/inventory/${String(item._id)}`, { desc: newDesc })
+  function onDescBlur(el) {
+    if (el.getAttribute('contenteditable') !== 'true') return
+    el.setAttribute('contenteditable', 'false')
+    el.classList.remove('editable-cell')
+    const id = el.dataset.id
+    const newDesc = el.textContent?.trim() ?? ''
+    const item = inventory.find(
+      (i) => String(i._id || '') === id || String(inventory.indexOf(i)) === id
+    )
+    if (!item || (item.desc || '') === newDesc) return
+    if (item._id) {
+      api.put(`/api/inventory/${String(item._id)}`, { desc: newDesc })
+        .then(() => {
           item.desc = newDesc
           localStorage.setItem(STORAGE_KEY, JSON.stringify(inventory))
-        } catch {
+        })
+        .catch(() => {
           el.textContent = item.desc || '(No description)'
-        }
-      } else {
-        item.desc = newDesc
-        saveLocalInventory(inventory)
-      }
+        })
+    } else {
+      item.desc = newDesc
+      saveLocalInventory(inventory)
+    }
+  }
+
+  if (isAdmin()) {
+    invBody.querySelectorAll('.inv-desc-cell').forEach((el) => {
+      el.addEventListener('blur', () => onDescBlur(el))
     })
-  })
+  }
 
   invBody.querySelectorAll('.btn-icon.btn-edit').forEach((el) => {
     el.addEventListener('click', () => {
       const row = el.closest('tr')
       const descCell = row?.querySelector('.inv-desc-cell')
-      if (descCell) descCell.focus()
+      if (descCell && isAdmin()) {
+        descCell.setAttribute('contenteditable', 'true')
+        descCell.classList.add('editable-cell')
+        descCell.focus()
+      }
     })
   })
 
