@@ -371,6 +371,15 @@ body:has(#main-app) {
   color: var(--primary-dark);
 }
 
+/* Bottom margin for Scheduling, Deliveries, Procurement, Gate Pass, Deployed Equipment */
+#content-area[data-route="scheduling"],
+#content-area[data-route="deliveries"],
+#content-area[data-route="procurement"],
+#content-area[data-route="gatepass"],
+#content-area[data-route="deployment"] {
+  padding-bottom: 60px;
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

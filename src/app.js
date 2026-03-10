@@ -183,6 +183,8 @@ async function loadView(route) {
   const area = document.getElementById('content-area')
   if (!area) return
 
+  area.dataset.route = route
+
   try {
     const res = await fetch(`/views/${route}.html`)
     if (res.ok) {
