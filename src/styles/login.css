@@ -8,7 +8,7 @@
   align-items: center;
   justify-content: flex-end;
   gap: 24px;
-  padding: 16px 32px;
+  padding: 20px 32px;
   background: rgba(30, 41, 59, 0.85);
   backdrop-filter: blur(8px);
   border-top: 1px solid rgba(148, 163, 184, 0.2);
@@ -16,7 +16,7 @@
 }
 
 .login-logo-item {
-  height: 40px;
+  height: 56px;
   width: auto;
   object-fit: contain;
   opacity: 0.95;
