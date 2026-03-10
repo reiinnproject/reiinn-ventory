@@ -77,17 +77,11 @@
   }
 
   /* Clock: smaller on mobile */
-  .live-clock-fixed {
-    top: 12px;
-    right: 12px;
-    padding: 8px 12px;
-  }
-
-  #clock-time {
+  .live-clock-inline #clock-time {
     font-size: 14px;
   }
 
-  #clock-date {
+  .live-clock-inline #clock-date {
     font-size: 10px;
   }
 
@@ -127,7 +121,7 @@
     padding: 0 12px;
   }
 
-  .live-clock-fixed {
+  .live-clock-inline {
     display: none;
   }
 

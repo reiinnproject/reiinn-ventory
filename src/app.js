@@ -46,7 +46,7 @@ async function init() {
 
   document.getElementById('login-screen')?.remove()
   document.getElementById('main-app').style.display = 'flex'
-  document.getElementById('live-clock').style.display = 'block'
+  document.getElementById('live-clock').style.display = 'flex'
 
   document.getElementById('descModal')?.addEventListener('click', (e) => {
     if (e.target.id === 'descModal') document.getElementById('descModal').style.display = 'none'
