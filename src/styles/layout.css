@@ -9,28 +9,41 @@ body {
   overflow: hidden;
 }
 
-/* App header - dark blue bar with hamburger and clock */
-.app-header {
+/* App page: allow scroll when content overflows */
+body:has(#main-app) {
+  overflow-y: auto;
+  align-items: flex-start;
+}
+
+/* Mobile header - visible only on small screens via responsive.css */
+.mobile-header {
+  display: none;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: 56px;
   background: var(--sidebar-bg);
-  display: flex;
+  color: white;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
+  gap: 12px;
+  padding: 0 16px;
   z-index: 1000;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
+.mobile-header span {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
 .btn-hamburger {
-  background: #f97316;
+  background: none;
   border: none;
   color: white;
   cursor: pointer;
-  padding: 10px 14px;
+  padding: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -38,67 +51,56 @@ body {
 }
 
 .btn-hamburger:hover {
-  background: #ea580c;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .btn-hamburger:focus {
   outline: none;
 }
 
-.live-clock {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 13px;
-}
-
-#clock-date {
-  color: #94a3b8;
-}
-
-#clock-time {
-  color: #f59e0b;
-  font-weight: 700;
-  font-size: 15px;
-}
-
 #main-app {
   width: 100vw;
   min-height: 100vh;
-  padding-top: 56px;
   background: var(--light-bg);
   display: flex;
   flex-direction: row;
 }
 
-/* Sidebar collapse - when hidden, content expands (desktop only) */
-@media (min-width: 769px) {
-  body.sidebar-collapsed .sidebar {
-    width: 0 !important;
-    min-width: 0 !important;
-    overflow: hidden;
-    padding: 0;
-    border: none;
-    box-shadow: none;
-  }
+#live-clock {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: var(--sidebar-bg);
+  padding: 10px 15px;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 10000;
+  pointer-events: none;
+}
 
-  body.sidebar-collapsed .sidebar > * {
-    opacity: 0;
-    pointer-events: none;
-    white-space: nowrap;
-  }
+#clock-date {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+#clock-time {
+  font-size: 15px;
+  font-weight: 700;
+  color: #f59e0b;
 }
 
 .sidebar {
   width: 280px;
-  min-width: 280px;
   background: var(--sidebar-bg);
   color: white;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-  transition: width 0.3s ease, min-width 0.3s ease;
 }
 
 .sidebar-header {
@@ -314,6 +316,7 @@ body {
   flex-grow: 1;
   padding: 40px;
   overflow-y: auto;
+  min-height: 0;
   color: var(--primary-dark);
 }
 
