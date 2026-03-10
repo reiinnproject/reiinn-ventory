@@ -148,10 +148,14 @@ async function renderList() {
   const paginationEl = document.getElementById('invPagination')
   const prevBtn = document.getElementById('invPrev')
   const nextBtn = document.getElementById('invNext')
-  const pageInfoEl = document.getElementById('invPageInfo')
+  const pageSelectEl = document.getElementById('invPageSelect')
   if (paginationEl) {
     paginationEl.style.display = filtered.length > PAGE_SIZE ? 'flex' : 'none'
-    if (pageInfoEl) pageInfoEl.textContent = `Page ${currentPage} of ${totalPages}`
+    if (pageSelectEl) {
+      pageSelectEl.innerHTML = Array.from({ length: totalPages }, (_, i) => i + 1)
+        .map((p) => `<option value="${p}"${p === currentPage ? ' selected' : ''}>${p}</option>`)
+        .join('')
+    }
     if (prevBtn) prevBtn.disabled = currentPage <= 1
     if (nextBtn) nextBtn.disabled = currentPage >= totalPages
   }
@@ -215,6 +219,13 @@ function bindEvents() {
   document.getElementById('invNext')?.addEventListener('click', () => {
     if (currentPage < totalPages) {
       currentPage++
+      renderList()
+    }
+  })
+  document.getElementById('invPageSelect')?.addEventListener('change', (e) => {
+    const page = parseInt(e.target.value, 10)
+    if (!isNaN(page) && page >= 1 && page <= totalPages) {
+      currentPage = page
       renderList()
     }
   })

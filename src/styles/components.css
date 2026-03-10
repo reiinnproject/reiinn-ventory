@@ -110,9 +110,16 @@ table {
   cursor: not-allowed;
 }
 
-#invPageInfo {
+.inv-page-select {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: white;
   font-size: 12px;
+  font-weight: 600;
   color: #64748b;
+  cursor: pointer;
+  min-width: 60px;
 }
 
 .inv-desc-cell {
